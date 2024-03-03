@@ -100,11 +100,11 @@ spec:
         {{- if .Values.extraVolumes }}
         {{- toYaml .Values.extraVolumes | nindent 6 }}
         {{- end }}
-        {{- with .Values.nodeSelector }}
       dnsConfig:
         options:
           - name: ndots
             value: '1'
+        {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
