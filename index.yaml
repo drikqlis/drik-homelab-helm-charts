@@ -3,6 +3,20 @@ entries:
   dagonite-empire:
   - apiVersion: v2
     appVersion: latest
+    created: "2024-03-11T22:25:18.348879119Z"
+    dependencies:
+    - name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 14.1.12
+    description: A Helm chart for Kubernetes
+    digest: 407cd5be1a492b14e6313d2a2eac29d4e209bf73d43752bff050b89a39048fe0
+    name: dagonite-empire
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/dagonite-empire-0.1.8/dagonite-empire-0.1.8.tgz
+    version: 0.1.8
+  - apiVersion: v2
+    appVersion: latest
     created: "2024-03-11T22:08:36.620415057Z"
     dependencies:
     - name: postgresql
@@ -60,4 +74,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/jellyfin-0.1.8/jellyfin-0.1.8.tgz
     version: 0.1.8
-generated: "2024-03-11T22:08:36.822234194Z"
+generated: "2024-03-11T22:25:18.348904206Z"
