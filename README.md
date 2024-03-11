@@ -2,7 +2,7 @@
 <img src="https://raw.githubusercontent.com/drikqlis/drik-homelab/main/files/drik-it-logo.svg" alt="drik-it-logo" width="500"/>
 <br />
 
-### Drik.IT Homelab Helm Charts
+<h3>Drik.IT Homelab Helm Charts</h3>
 
 </div>
 
