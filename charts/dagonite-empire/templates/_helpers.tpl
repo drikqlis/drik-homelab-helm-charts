@@ -60,3 +60,10 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create connection string
+*/}}
+{{- define "connectionString" }}
+Server=dagonite-empire-postgresql;Port=5432;Database={{ .Values.global.postgresql.auth.database }};User Id={{ .Values.global.postgresql.auth.username }};Password={{ .Values.global.postgresql.auth.password }};
+{{- end }}
