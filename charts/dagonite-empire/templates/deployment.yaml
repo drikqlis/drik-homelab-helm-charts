@@ -38,7 +38,10 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: ConnectionStrings__DefaultConnection
-            value: "Server=dagonite-empire-postgresql;Port=5432;Database={{ .Values.global.postgresql.auth.database }};User Id={{ .Values.global.postgresql.auth.username }};Password={{ .Values.global.postgresql.auth.password }};"
+            valueFrom:
+              secretKeyRef:
+                name: connection-string-secret
+                key: connection-string
           - name: ASPNETCORE_ENVIRONMENT
             value: "Development"
           ports:
