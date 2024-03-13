@@ -3,6 +3,20 @@ entries:
   dagonite-empire:
   - apiVersion: v2
     appVersion: latest
+    created: "2024-03-13T22:59:33.525783503Z"
+    dependencies:
+    - name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 14.3.3
+    description: A Helm chart for Kubernetes
+    digest: cda8f6ba4cef5810c2935662bc114fd0d3f54f866425631e165d786b1c564639
+    name: dagonite-empire
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/dagonite-empire-0.1.13/dagonite-empire-0.1.13.tgz
+    version: 0.1.13
+  - apiVersion: v2
+    appVersion: latest
     created: "2024-03-11T22:52:14.070516821Z"
     dependencies:
     - name: postgresql
@@ -101,6 +115,16 @@ entries:
     version: 0.1.6
   jellyfin:
   - apiVersion: v2
+    appVersion: 10.8.13
+    created: "2024-03-13T22:59:33.69810719Z"
+    description: A Helm chart for Kubernetes
+    digest: 1c36e7177ca51381e351d416199aa62fcd3bdf5c44841c46fc7995d60771083f
+    name: jellyfin
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/jellyfin-0.1.13/jellyfin-0.1.13.tgz
+    version: 0.1.13
+  - apiVersion: v2
     appVersion: latest
     created: "2024-03-11T22:47:28.376211459Z"
     description: A Helm chart for Kubernetes
@@ -140,4 +164,27 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/jellyfin-0.1.8/jellyfin-0.1.8.tgz
     version: 0.1.8
-generated: "2024-03-11T22:52:14.070537861Z"
+  vaultwarden:
+  - apiVersion: v2
+    appVersion: 1.30.5-alpine
+    created: "2024-03-13T22:59:33.872246548Z"
+    dependencies:
+    - name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 14.3.3
+    description: vaultwarden is an unofficial Bitwarden-compatible server written
+      in Rust
+    digest: 9f3cdec609c8e44614e44f2b2c4aa892300d6f5c85fde134af0d774601f8cb11
+    keywords:
+    - Rust
+    - vaultwarden
+    kubeVersion: '>=1.12.0-0'
+    name: vaultwarden
+    sources:
+    - https://github.com/guerzon/vaultwarden
+    - https://github.com/dani-garcia/vaultwarden
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
+    version: 0.22.6
+generated: "2024-03-13T22:59:33.872276203Z"
