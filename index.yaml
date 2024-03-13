@@ -167,6 +167,28 @@ entries:
   vaultwarden:
   - apiVersion: v2
     appVersion: 1.30.5-alpine
+    created: "2024-03-13T23:50:18.067876703Z"
+    dependencies:
+    - name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 14.3.3
+    description: vaultwarden is an unofficial Bitwarden-compatible server written
+      in Rust
+    digest: efd41876b185dba4c0bd57fc962065ccb80b1de0adeaad124988cf2290c43767
+    keywords:
+    - Rust
+    - vaultwarden
+    kubeVersion: '>=1.12.0-0'
+    name: vaultwarden
+    sources:
+    - https://github.com/guerzon/vaultwarden
+    - https://github.com/dani-garcia/vaultwarden
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.10/vaultwarden-0.22.10.tgz
+    version: 0.22.10
+  - apiVersion: v2
+    appVersion: 1.30.5-alpine
     created: "2024-03-13T23:46:34.145010433Z"
     dependencies:
     - name: postgresql
@@ -253,4 +275,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-03-13T23:46:34.145044437Z"
+generated: "2024-03-13T23:50:18.067903303Z"
