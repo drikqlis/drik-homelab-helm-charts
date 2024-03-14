@@ -41,7 +41,7 @@ containers:
             name: {{ default (include "vaultwarden.fullname" .) .Values.smtp.existingSecret }}
             key: {{ default "SMTP_PASSWORD" .Values.smtp.password.existingSecretKey }}
       {{- end }}
-      {{- if not ( eq .Values.adminToken.value "" ) }}
+      {{- if .Values.adminToken }}
       - name: ADMIN_TOKEN
         valueFrom:
           secretKeyRef:
