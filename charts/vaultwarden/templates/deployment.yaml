@@ -29,9 +29,15 @@ spec:
       labels:
         app.kubernetes.io/component: vaultwarden
         {{- include "vaultwarden.selectorLabels" . | nindent 8 }}
+      {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha1sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha1sum }}
+        {{- with .Values.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- include "vaultwarden.podSpec" . | nindent 6 }}
       volumes:
