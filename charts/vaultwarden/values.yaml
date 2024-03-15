@@ -30,11 +30,6 @@ image:
 ##
 fullnameOverride: ""
 
-## @param resourceType Can be either Deployment or StatefulSet
-## Overwrite automatic resource type detection by specifying the resource type
-##
-resourceType: ""
-
 ## @param commonAnnotations Annotations for the deployment or statefulset
 ##
 commonAnnotations: {}
@@ -238,9 +233,9 @@ webVaultEnabled: "true"
 
 database:
   ## @param database.type Database type, either mysql or postgresql
-  ## Default is a sqlite database.
+  ## Default is a postgresql database.
   ##
-  type: "default"
+  type: "postgresql"
   ## @param database.host Database hostname or IP address
   ##
   host: ""

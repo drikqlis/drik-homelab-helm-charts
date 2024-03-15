@@ -77,18 +77,3 @@ Return the appropriate apiVersion for podDisruptionBudget.
 {{- print "policy/v1beta1" -}}
 {{- end -}}
 {{- end -}}
-
-{{/*
-Determine whether to use deployment or statefulset
-*/}}
-{{- define "vaultwarden.resourceType" -}}
-{{- if .Values.resourceType }}
-{{- .Values.resourceType }}
-{{- else }}
-{{- if (and .Values.data (ne .Values.database.type "default")) }}
-{{- "Deployment" }}
-{{- else }}
-{{- "StatefulSet" }}
-{{- end }}
-{{- end }}
-{{- end }}
