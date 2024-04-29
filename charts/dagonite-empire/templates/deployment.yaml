@@ -48,7 +48,10 @@ spec:
                 name: email-config-secret
                 key: host
           - name: Email__Port
-            value: "{{ .Values.email.port }}"
+            valueFrom:
+              secretKeyRef:
+                name: email-config-secret
+                key: port
           - name: Email__Username
             valueFrom:
               secretKeyRef:
@@ -70,7 +73,10 @@ spec:
                 name: email-config-secret
                 key: name
           - name: Email__EnableSSL
-            value: "{{ .Values.email.enable_ssl }}"
+            valueFrom:
+              secretKeyRef:
+                name: email-config-secret
+                key: enable_ssl
           - name: ASPNETCORE_ENVIRONMENT
             value: "Development"
           ports:
