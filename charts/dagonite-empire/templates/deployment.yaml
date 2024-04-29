@@ -42,6 +42,41 @@ spec:
               secretKeyRef:
                 name: connection-string-secret
                 key: connection-string
+          - name: Email__Host
+            valueFrom:
+              secretKeyRef:
+                name: email-config-secret
+                key: host
+          - name: Email__Port
+            valueFrom:
+              secretKeyRef:
+                name: email-config-secret
+                key: port
+          - name: Email__Username
+            valueFrom:
+              secretKeyRef:
+                name: email-config-secret
+                key: username
+          - name: Email__Password
+            valueFrom:
+              secretKeyRef:
+                name: email-config-secret
+                key: password
+          - name: Email__From
+            valueFrom:
+              secretKeyRef:
+                name: email-config-secret
+                key: from
+          - name: Email__Name
+            valueFrom:
+              secretKeyRef:
+                name: email-config-secret
+                key: name
+          - name: Email__EnableSSL
+            valueFrom:
+              secretKeyRef:
+                name: email-config-secret
+                key: enable_ssl
           - name: ASPNETCORE_ENVIRONMENT
             value: "Development"
           ports:

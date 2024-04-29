@@ -112,6 +112,16 @@ tolerations: []
 
 affinity: {}
 
+# email settings
+email:
+  host: example.com
+  port: 587
+  username: username@example.com
+  password: example_pass
+  from: username@example.com
+  name: username@example.com
+  enable_ssl: true
+
 # postgresql settings
 global:
   postgresql:
