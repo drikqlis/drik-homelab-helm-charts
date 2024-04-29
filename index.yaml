@@ -3,6 +3,20 @@ entries:
   dagonite-empire:
   - apiVersion: v2
     appVersion: latest
+    created: "2024-04-29T20:55:09.304047306Z"
+    dependencies:
+    - name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 14.3.3
+    description: A Helm chart for Kubernetes
+    digest: c4ba5ed2c3d5fbc368897a10106ff805fbbf3d269c214523e476d82d86a0eaa9
+    name: dagonite-empire
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/dagonite-empire-0.1.14/dagonite-empire-0.1.14.tgz
+    version: 0.1.14
+  - apiVersion: v2
+    appVersion: latest
     created: "2024-03-13T22:59:33.525783503Z"
     dependencies:
     - name: postgresql
@@ -561,4 +575,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-03-15T18:21:46.192469338Z"
+generated: "2024-04-29T20:55:09.304108621Z"
