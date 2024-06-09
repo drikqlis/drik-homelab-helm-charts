@@ -247,6 +247,16 @@ entries:
   prowlarr:
   - apiVersion: v2
     appVersion: 1.18.0.4543-ls73
+    created: "2024-06-09T21:00:54.250272629Z"
+    description: A Helm chart for Kubernetes
+    digest: 81db116b88c134aacb521ab3aa372bf7030a8719a4ca8aa33f791f82d9168f70
+    name: prowlarr
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/prowlarr-0.1.1/prowlarr-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.18.0.4543-ls73
     created: "2024-06-09T20:56:59.007595578Z"
     description: A Helm chart for Kubernetes
     digest: 3aef6180b31df3dae8ecd07d358606b08f838af602d8ffc05e0e20066ac74742
@@ -805,4 +815,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-06-09T20:56:59.007707718Z"
+generated: "2024-06-09T21:00:54.250382066Z"
