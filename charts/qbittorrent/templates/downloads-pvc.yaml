@@ -14,9 +14,6 @@ spec:
   resources:
     requests:
       storage: {{ .Values.persistence.downloads.size | quote }}
-{{- if .Values.persistence.downloads.volumeName }}
-  volumeName: {{ .Values.persistence.downloads.volumeName }}
-{{- end }}
 {{- if .Values.persistence.downloads.storageClass }}
 {{- if (eq "-" .Values.persistence.downloads.storageClass) }}
   storageClassName: ""
