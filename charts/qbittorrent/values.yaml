@@ -4,7 +4,7 @@
 
 replicaCount: 1
 
-webui_port: 80
+webuiPort: 80
 
 image:
   repository: nginx
