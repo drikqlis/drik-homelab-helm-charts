@@ -94,6 +94,8 @@ persistence:
     ## the existingClaim variable
     # existingClaim: your-claim
     # subPath: some-subpath
+    ## If you want to use existing volume specify volumeName
+    # volumeName: your-volume
     accessMode: ReadWriteOnce
     size: 1Gi
 

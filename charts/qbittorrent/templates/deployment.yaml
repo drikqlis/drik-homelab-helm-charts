@@ -78,14 +78,14 @@ spec:
         - name: config
         {{- if .Values.persistence.config.enabled }}
           persistentVolumeClaim:
-            claimName: {{ if .Values.persistence.config.existingClaim }}{{ .Values.persistence.config.existingClaim }}{{- else }}{{ template "jellyfin.fullname" . }}-config{{- end }}
+            claimName: {{ if .Values.persistence.config.existingClaim }}{{ .Values.persistence.config.existingClaim }}{{- else }}{{ template "qbittorrent.fullname" . }}-config{{- end }}
         {{- else }}
           emptyDir: {}
         {{- end }}
         - name: downloads
         {{- if .Values.persistence.downloads.enabled }}
           persistentVolumeClaim:
-            claimName: {{ if .Values.persistence.downloads.existingClaim }}{{ .Values.persistence.downloads.existingClaim }}{{- else }}{{ template "jellyfin.fullname" . }}-downloads{{- end }}
+            claimName: {{ if .Values.persistence.downloads.existingClaim }}{{ .Values.persistence.downloads.existingClaim }}{{- else }}{{ template "qbittorrent.fullname" . }}-downloads{{- end }}
         {{- else }}
           emptyDir: {}
         {{- end }}
