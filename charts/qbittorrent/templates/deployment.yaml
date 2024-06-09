@@ -61,10 +61,10 @@ spec:
             {{- if .Values.persistence.config.subPath }}
               subPath: {{ .Values.persistence.config.subPath }}
             {{- end }}
-            - mountPath: /downloads
-              name: downloads
-            {{- if .Values.persistence.downloads.subPath }}
-              subPath: {{ .Values.persistence.downloads.subPath }}
+            - mountPath: /data
+              name: data
+            {{- if .Values.persistence.data.subPath }}
+              subPath: {{ .Values.persistence.data.subPath }}
             {{- end }}
             {{- range .Values.persistence.extraExistingClaimMounts }}
             - name: {{ .name }}
@@ -82,10 +82,10 @@ spec:
         {{- else }}
           emptyDir: {}
         {{- end }}
-        - name: downloads
-        {{- if .Values.persistence.downloads.enabled }}
+        - name: data
+        {{- if .Values.persistence.data.enabled }}
           persistentVolumeClaim:
-            claimName: {{ if .Values.persistence.downloads.existingClaim }}{{ .Values.persistence.downloads.existingClaim }}{{- else }}{{ template "qbittorrent.fullname" . }}-downloads{{- end }}
+            claimName: {{ if .Values.persistence.data.existingClaim }}{{ .Values.persistence.data.existingClaim }}{{- else }}{{ template "qbittorrent.fullname" . }}-data{{- end }}
         {{- else }}
           emptyDir: {}
         {{- end }}

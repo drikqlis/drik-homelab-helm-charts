@@ -79,9 +79,9 @@ persistence:
     # subPath: some-subpath
     accessMode: ReadWriteOnce
     size: 1Gi
-  downloads:
+  data:
     enabled: false
-    ## qbittorrent downloads data Persistent Volume Storage Class
+    ## qbittorrent data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is
