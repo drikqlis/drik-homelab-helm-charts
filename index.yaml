@@ -244,6 +244,17 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/jellyfin-0.1.8/jellyfin-0.1.8.tgz
     version: 0.1.8
+  qbittorrent:
+  - apiVersion: v2
+    appVersion: 4.6.5-r0-ls333
+    created: "2024-06-09T01:44:16.579915318Z"
+    description: A Helm chart for Kubernetes
+    digest: 559b48d8f7308e09c06bdabde099a041476df4330fc98fee875432d6109dfa77
+    name: qbittorrent
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/qbittorrent-0.1.0/qbittorrent-0.1.0.tgz
+    version: 0.1.0
   vaultwarden:
   - apiVersion: v2
     appVersion: 1.30.5
@@ -641,4 +652,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-06-08T22:43:08.71526037Z"
+generated: "2024-06-09T01:44:16.580014252Z"
