@@ -1,5 +1,16 @@
 apiVersion: v1
 entries:
+  bazarr:
+  - apiVersion: v2
+    appVersion: v1.4.3-ls254
+    created: "2024-06-10T20:11:41.260373849Z"
+    description: A Helm chart for Kubernetes
+    digest: b9ceab0583cc43b008017e45a54a0107beb4dc5ab5128ebb4bc6b0fb0a33f4d5
+    name: bazarr
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/bazarr-0.1.0/bazarr-0.1.0.tgz
+    version: 0.1.0
   dagonite-empire:
   - apiVersion: v2
     appVersion: latest
@@ -815,4 +826,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-06-09T21:00:54.250382066Z"
+generated: "2024-06-10T20:11:41.260512398Z"
