@@ -255,6 +255,17 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/jellyfin-0.1.8/jellyfin-0.1.8.tgz
     version: 0.1.8
+  jellyseerr:
+  - apiVersion: v2
+    appVersion: 1.9.0
+    created: "2024-06-11T18:42:38.464103586Z"
+    description: A Helm chart for Kubernetes
+    digest: a17d242e320249430ecdbdf56a1b0d0914df4bf70aa95b89063382b5cf197df0
+    name: jellyseerr
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/jellyseerr-0.1.0/jellyseerr-0.1.0.tgz
+    version: 0.1.0
   prowlarr:
   - apiVersion: v2
     appVersion: 1.18.0.4543-ls73
@@ -826,4 +837,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-06-10T20:11:41.260512398Z"
+generated: "2024-06-11T18:42:38.464201148Z"
