@@ -258,6 +258,16 @@ entries:
   jellyseerr:
   - apiVersion: v2
     appVersion: 1.9.0
+    created: "2024-06-11T18:56:38.417940993Z"
+    description: A Helm chart for Kubernetes
+    digest: c3f92fa5b71f574df5e8474171c978e484172ff0be7a5bfcf0d4a3ffef7c11f4
+    name: jellyseerr
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/jellyseerr-0.1.1/jellyseerr-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.9.0
     created: "2024-06-11T18:42:38.464103586Z"
     description: A Helm chart for Kubernetes
     digest: a17d242e320249430ecdbdf56a1b0d0914df4bf70aa95b89063382b5cf197df0
@@ -837,4 +847,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-06-11T18:42:38.464201148Z"
+generated: "2024-06-11T18:56:38.418078751Z"
