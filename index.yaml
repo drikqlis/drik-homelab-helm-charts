@@ -429,6 +429,17 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/radarr-0.1.0/radarr-0.1.0.tgz
     version: 0.1.0
+  sabnzbd:
+  - apiVersion: v2
+    appVersion: 4.3.2-ls166
+    created: "2024-06-14T22:35:39.236584199Z"
+    description: A Helm chart for Kubernetes
+    digest: 63181fe5e519ffca2aaea51016f2e3c984cd3f2f633dd9ef7264e6063fb35973
+    name: sabnzbd
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/sabnzbd-0.1.0/sabnzbd-0.1.0.tgz
+    version: 0.1.0
   sonarr:
   - apiVersion: v2
     appVersion: 4.0.5.1710-ls241
@@ -857,4 +868,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-06-14T17:46:04.386101367Z"
+generated: "2024-06-14T22:35:39.236709813Z"
