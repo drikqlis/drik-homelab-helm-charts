@@ -471,6 +471,17 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/sonarr-0.1.0/sonarr-0.1.0.tgz
     version: 0.1.0
+  subgen:
+  - apiVersion: v2
+    appVersion: cpu
+    created: "2024-06-16T14:19:34.597001174Z"
+    description: A Helm chart for Kubernetes
+    digest: d18371a741763256c4986ce30951b9726eb965602b3d381f5279900156980c31
+    name: subgen
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/subgen-0.1.0/subgen-0.1.0.tgz
+    version: 0.1.0
   vaultwarden:
   - apiVersion: v2
     appVersion: 1.30.5
@@ -868,4 +879,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-06-14T22:35:39.236709813Z"
+generated: "2024-06-16T14:19:34.597131547Z"
