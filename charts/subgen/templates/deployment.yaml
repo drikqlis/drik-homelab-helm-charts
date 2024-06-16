@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "subgen.fullname" . }}
+  labels:
+    {{- include "subgen.labels" . | nindent 4 }}
+spec:
+  strategy:
+    type: Recreate
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "subgen.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "subgen.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "subgen.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: TRANSCRIBE_DEVICE
+            value: "{{ .Values.transcribeDevice }}"
+          - name: WHISPER_MODEL
+            value: "{{ .Values.whisperModel }}"
+          - name: CONCURRENT_TRANSCRIPTIONS
+            value: "{{ .Values.concurrentTranscriptions }}"
+          - name: WHISPER_THREADS
+            value: "{{ .Values.whisperThreads }}"
+          - name: NAMESUBLANG
+            value: "{{ .Values.nameSubLang }}"
+          - name: APPEND
+            value: "{{ .Values.appendInfo }}"
+          - name: DETECT_LANGUAGE_LENGTH
+            value: "{{ .Values.detectLanguageLength }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /subgen/models
+              name: config
+            {{- if .Values.persistence.config.subPath }}
+              subPath: {{ .Values.persistence.config.subPath }}
+            {{- end }}
+            {{- range .Values.persistence.extraExistingClaimMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              readOnly: {{ .readOnly }}
+            {{- end }}
+            {{- if .Values.extraVolumeMounts }}
+            {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: config
+        {{- if .Values.persistence.config.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.config.existingClaim }}{{ .Values.persistence.config.existingClaim }}{{- else }}{{ template "subgen.fullname" . }}-config{{- end }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        {{- range .Values.persistence.extraExistingClaimMounts }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .existingClaim }}
+        {{- end }}
+        {{- if .Values.extraVolumes }}
+        {{- toYaml .Values.extraVolumes | nindent 6 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
