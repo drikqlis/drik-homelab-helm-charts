@@ -196,6 +196,16 @@ entries:
     version: 0.1.6
   jellyfin:
   - apiVersion: v2
+    appVersion: 10.9.7
+    created: "2024-07-08T23:36:23.608889943Z"
+    description: A Helm chart for Kubernetes
+    digest: 1ddf4e70c4beee0a10b50fbd1b6fc8dd3f9813910bd054f7df0343d2098f8cbc
+    name: jellyfin
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/jellyfin-0.1.15/jellyfin-0.1.15.tgz
+    version: 0.1.15
+  - apiVersion: v2
     appVersion: 10.9.6
     created: "2024-06-08T22:43:08.71515276Z"
     description: A Helm chart for Kubernetes
@@ -879,4 +889,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-06-16T14:19:34.597131547Z"
+generated: "2024-07-08T23:36:23.608988989Z"
