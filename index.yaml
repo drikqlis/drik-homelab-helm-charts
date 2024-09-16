@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   bazarr:
   - apiVersion: v2
+    appVersion: v1.4.4-ls267
+    created: "2024-09-16T18:50:15.243068776Z"
+    description: A Helm chart for Kubernetes
+    digest: 555c06213aeeb933101ad492844fce5a4dabc437b41bb2dc5a9837cfc054d480
+    name: bazarr
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/bazarr-0.1.1/bazarr-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     appVersion: v1.4.3-ls254
     created: "2024-06-10T20:11:41.260373849Z"
     description: A Helm chart for Kubernetes
@@ -909,4 +919,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-09-08T21:18:38.1827394Z"
+generated: "2024-09-16T18:50:15.243223005Z"
