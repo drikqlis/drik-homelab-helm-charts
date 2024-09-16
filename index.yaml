@@ -450,6 +450,16 @@ entries:
     version: 0.1.0
   radarr:
   - apiVersion: v2
+    appVersion: 5.9.1.9070-ls237
+    created: "2024-09-16T19:14:43.886006153Z"
+    description: A Helm chart for Kubernetes
+    digest: 4356d8a4484605351faf73f3030e92f11b5842d7fa9db93efef36c6e1a76c3f3
+    name: radarr
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/radarr-0.1.4/radarr-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
     appVersion: '5.9.1.9070-ls237 '
     created: "2024-09-16T19:01:58.146399942Z"
     description: A Helm chart for Kubernetes
@@ -991,4 +1001,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-09-16T19:01:58.516743928Z"
+generated: "2024-09-16T19:14:43.886144562Z"
