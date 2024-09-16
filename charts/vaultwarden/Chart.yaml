@@ -8,8 +8,8 @@ keywords:
 sources:
   - https://github.com/guerzon/vaultwarden
   - https://github.com/dani-garcia/vaultwarden
-appVersion: "1.30.5"
-version: 0.22.23
+appVersion: "1.32.0"
+version: 0.22.24
 kubeVersion: ">=1.12.0-0"
 
 dependencies:
