@@ -20,7 +20,7 @@ initContainers:
 {{- toYaml . | nindent 8 }}
 {{- end }}
 containers:
-  - image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
+  - image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
     imagePullPolicy: {{ .Values.image.pullPolicy }}
     name: vaultwarden
     envFrom:
