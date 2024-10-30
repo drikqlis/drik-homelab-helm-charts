@@ -74,7 +74,6 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
           {{- if .Values.tls.enabled }}
             - name: mumble-cert-vol
