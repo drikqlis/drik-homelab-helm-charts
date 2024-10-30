@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mumble.fullname" . }}
+  labels:
+    {{- include "mumble.labels" . | nindent 4 }}
+spec:
+  strategy:
+    type: Recreate
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "mumble.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mumble.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mumble.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          {{- if .Values.tls.enabled }}
+          - name: MUMBLE_CONFIG_SSL_CERT
+            value: "/certs/fullchain.pem"
+          - name: MUMBLE_CONFIG_SSL_KEY
+            value: "/certs/privkey.pem"
+          {{- end }}
+          - name: MUMBLE_SUPERUSER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mumble-config-secret
+                key: superuser_password
+          - name: MUMBLE_CONFIG_SERVER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mumble-config-secret
+                key: server_password
+          - name: MUMBLE_WELCOME_TEXT
+            value: "{{ .Values.mumble.welcome_text }}"
+          - name: MUMBLE_USERS
+            value: "{{ .Values.mumble.max_users }}"
+          - name: MUMBLE_REGISTER_NAME
+            value: "{{ .Values.mumble.server_name }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+          {{- if .Values.tls.enabled }}
+            - name: mumble-cert-vol
+              mountPath: /certs
+              readOnly: true
+          {{- end }}
+            - mountPath: /data
+              name: data
+            {{- if .Values.persistence.data.subPath }}
+              subPath: {{ .Values.persistence.data.subPath }}
+            {{- end }}
+            {{- range .Values.persistence.extraExistingClaimMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              readOnly: {{ .readOnly }}
+            {{- end }}
+            {{- if .Values.extraVolumeMounts }}
+            {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+            {{- end }}
+      volumes:
+      {{- if .Values.tls.enabled }}
+        - name: mumble-cert-vol
+          secret:
+            secretName: {{ .Values.tls.secretName }}
+            defaultMode: 0644
+            items:
+              - key: tls.crt
+                path: fullchain.pem
+              - key: tls.key
+                path: privkey.pem
+        {{- end }}
+        - name: data
+        {{- if .Values.persistence.data.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.data.existingClaim }}{{ .Values.persistence.data.existingClaim }}{{- else }}{{ template "sonarr.fullname" . }}-data{{- end }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        {{- range .Values.persistence.extraExistingClaimMounts }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .existingClaim }}
+        {{- end }}
+        {{- if .Values.extraVolumes }}
+        {{- toYaml .Values.extraVolumes | nindent 6 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
