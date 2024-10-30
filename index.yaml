@@ -319,6 +319,16 @@ entries:
   mumble:
   - apiVersion: v2
     appVersion: v1.5.634
+    created: "2024-10-30T23:43:04.123088371Z"
+    description: A Helm chart for Kubernetes
+    digest: a9c7fbd5829677fb3aa2a03cafe8860da750227d65cb5cf29061ef408b7389d5
+    name: mumble
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/mumble-0.1.2/mumble-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: v1.5.634
     created: "2024-10-30T23:36:39.342637356Z"
     description: A Helm chart for Kubernetes
     digest: 4f9c382a359b85fd6d6432e0356321456f1aa3d57d7de83a6a983c0918fae97f
@@ -1044,4 +1054,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-10-30T23:36:39.342763081Z"
+generated: "2024-10-30T23:43:04.123267796Z"
