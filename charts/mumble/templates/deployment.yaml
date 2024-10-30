@@ -62,9 +62,12 @@ spec:
           - name: MUMBLE_REGISTER_NAME
             value: "{{ .Values.mumble.server_name }}"
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
+            - name: mumble-tcp
+              containerPort: 64738
               protocol: TCP
+            - name: mumble-udp
+              containerPort: 64738
+              protocol: UDP
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
@@ -102,11 +105,11 @@ spec:
                 path: fullchain.pem
               - key: tls.key
                 path: privkey.pem
-        {{- end }}
+      {{- end }}
         - name: data
         {{- if .Values.persistence.data.enabled }}
           persistentVolumeClaim:
-            claimName: {{ if .Values.persistence.data.existingClaim }}{{ .Values.persistence.data.existingClaim }}{{- else }}{{ template "sonarr.fullname" . }}-data{{- end }}
+            claimName: {{ if .Values.persistence.data.existingClaim }}{{ .Values.persistence.data.existingClaim }}{{- else }}{{ template "mumble.fullname" . }}-data{{- end }}
         {{- else }}
           emptyDir: {}
         {{- end }}
