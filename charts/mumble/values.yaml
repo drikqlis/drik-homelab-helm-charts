@@ -87,12 +87,12 @@ livenessProbe:
   tcpSocket:
     port: 64738
     initialDelaySeconds: 15
-    periodSeconds: 10
+    periodSeconds: 30
 readinessProbe:
   tcpSocket:
     port: 64738
     initialDelaySeconds: 15
-    periodSeconds: 10
+    periodSeconds: 30
 
 #This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
