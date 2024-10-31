@@ -55,11 +55,11 @@ spec:
               secretKeyRef:
                 name: mumble-config-secret
                 key: server_password
-          - name: MUMBLE_WELCOME_TEXT
+          - name: MUMBLE_CONFIG_WELCOME_TEXT
             value: "{{ .Values.mumble.welcome_text }}"
-          - name: MUMBLE_USERS
+          - name: MUMBLE_CONFIG_USERS
             value: "{{ .Values.mumble.max_users }}"
-          - name: MUMBLE_REGISTER_NAME
+          - name: MUMBLE_CONFIG_REGISTER_NAME
             value: "{{ .Values.mumble.server_name }}"
           ports:
             - name: mumble-tcp
