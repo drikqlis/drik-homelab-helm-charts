@@ -1,0 +1,24 @@
+{{- if and .Values.persistence.upload.enabled (not .Values.persistence.upload.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "dagonite-empire.fullname" . }}-upload
+  labels:
+    app.kubernetes.io/name: {{ include "dagonite-empire.name" . }}
+    helm.sh/chart: {{ include "dagonite-empire.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.upload.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.upload.size | quote }}
+{{- if .Values.persistence.upload.storageClass }}
+{{- if (eq "-" .Values.persistence.upload.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.persistence.upload.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end -}}
