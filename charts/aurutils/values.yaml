@@ -43,7 +43,7 @@ podSecurityContext:
   fsGroupChangePolicy: Always
 
 securityContext:
-  readOnlyRootFilesystem: true
+  readOnlyRootFilesystem: false
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 1000
