@@ -1,0 +1,24 @@
+{{- if and .Values.persistence.repo.enabled (not .Values.persistence.repo.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "aurutils.fullname" . }}-repo
+  labels:
+    app.kubernetes.io/name: {{ include "aurutils.name" . }}
+    helm.sh/chart: {{ include "aurutils.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.repo.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.repo.size | quote }}
+{{- if .Values.persistence.repo.storageClass }}
+{{- if (eq "-" .Values.persistence.repo.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.persistence.repo.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end -}}
