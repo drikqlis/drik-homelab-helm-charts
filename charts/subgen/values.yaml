@@ -115,6 +115,8 @@ livenessProbe:
   httpGet:
     path: /
     port: 9000
+  failureThreshold: 360
+  periodSeconds: 60
 readinessProbe:
   httpGet:
     path: /
