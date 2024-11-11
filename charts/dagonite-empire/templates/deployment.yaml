@@ -44,6 +44,18 @@ spec:
               secretKeyRef:
                 name: connection-string-secret
                 key: connection-string
+          - name: ConnectionStrings__TestAccountsEnable
+            value: "{{ .Values.enableTestAccounts | toString }}"
+          - name: ConnectionStrings__GameMasterEmail
+            valueFrom:
+              secretKeyRef:
+                name: connection-string-secret
+                key: game-master-email
+          - name: ConnectionStrings__GameMasterPassword
+            valueFrom:
+              secretKeyRef:
+                name: connection-string-secret
+                key: game-master-password
           - name: Email__Host
             valueFrom:
               secretKeyRef:
@@ -80,7 +92,7 @@ spec:
                 name: email-config-secret
                 key: enable_ssl
           - name: ASPNETCORE_ENVIRONMENT
-            value: "Development"
+            value: "{{ .Values.aspnetcoreEnvironment }}"
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

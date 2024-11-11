@@ -96,7 +96,7 @@ autoscaling:
 persistence:
   upload:
     enabled: false
-    ## mumble data Persistent Volume Storage Class
+    ## dagonite-empire data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is
@@ -140,6 +140,14 @@ email:
   from: username@example.com
   name: username@example.com
   enable_ssl: "True"
+
+# accounts settings
+enableTestAccounts: false
+gameMasterEmail: gamemaster@example.com
+gameMasterPassword: verysafepassword
+
+# env setting - possible values: Development, Staging, Production
+aspnetcoreEnvironment: Production
 
 # postgresql settings
 global:
