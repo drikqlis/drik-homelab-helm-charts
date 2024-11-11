@@ -788,6 +788,16 @@ entries:
   subgen:
   - apiVersion: v2
     appVersion: cpu
+    created: "2024-11-11T18:25:39.640466768Z"
+    description: A Helm chart for Kubernetes
+    digest: 23795e0a6e2d3a5e64e35a696bc214b6b40251e1111d9afd599f295ae77486d5
+    name: subgen
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/subgen-0.1.2/subgen-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: cpu
     created: "2024-09-08T21:18:38.182596733Z"
     description: A Helm chart for Kubernetes
     digest: abde554d0cdbaf5a9db07af078b55469252e6fa6cafef8b7922801d71713256f
@@ -1247,4 +1257,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-11-11T14:53:17.934661497Z"
+generated: "2024-11-11T18:25:39.640643439Z"
