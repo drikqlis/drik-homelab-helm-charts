@@ -149,6 +149,9 @@ gameMasterPassword: verysafepassword
 # env setting - possible values: Development, Staging, Production
 aspnetcoreEnvironment: Production
 
+# debug errors
+detailedErrors: false
+
 # postgresql settings
 global:
   postgresql:

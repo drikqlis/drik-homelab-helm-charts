@@ -46,6 +46,8 @@ spec:
                 key: connection-string
           - name: ConnectionStrings__TestAccountsEnable
             value: "{{ .Values.enableTestAccounts | toString }}"
+          - name: DetailedErrors
+            value: "{{ .Values.detailedErrors | toString }}"
           - name: ConnectionStrings__GameMasterEmail
             valueFrom:
               secretKeyRef:
