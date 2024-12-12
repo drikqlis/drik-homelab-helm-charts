@@ -810,6 +810,17 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/sabnzbd-0.1.0/sabnzbd-0.1.0.tgz
     version: 0.1.0
+  signal-cli:
+  - apiVersion: v2
+    appVersion: "0.89"
+    created: "2024-12-12T19:11:40.451319988Z"
+    description: A Helm chart for Kubernetes
+    digest: 1ed72a05ecf14a7fed4cf6a1494a2f3dd6b731b2326629eb7b9426270dcb3e9f
+    name: signal-cli
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/signal-cli-0.1.0/signal-cli-0.1.0.tgz
+    version: 0.1.0
   sonarr:
   - apiVersion: v2
     appVersion: 4.0.9.2244-ls254
@@ -1323,4 +1334,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-11-28T14:47:11.054059515Z"
+generated: "2024-12-12T19:11:40.451495958Z"
