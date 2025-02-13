@@ -789,6 +789,17 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/radarr-0.1.0/radarr-0.1.0.tgz
     version: 0.1.0
+  ragflow:
+  - apiVersion: v2
+    appVersion: dev
+    created: "2025-02-13T21:22:04.116534843Z"
+    description: A Helm chart for deploying RAGFlow on Kubernetes
+    digest: 822c5b596ae36449b5a8ab470083ab7645403c98b849ee955667182e063b1c80
+    name: ragflow
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/ragflow-0.1.1/ragflow-0.1.1.tgz
+    version: 0.1.1
   sabnzbd:
   - apiVersion: v2
     appVersion: 4.3.3-ls181
@@ -1344,4 +1355,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2024-12-12T19:18:24.729370399Z"
+generated: "2025-02-13T21:22:04.116747422Z"
