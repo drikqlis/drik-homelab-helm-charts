@@ -628,6 +628,16 @@ entries:
     version: 0.1.0
   prowlarr:
   - apiVersion: v2
+    appVersion: 1.30.2.4939-ls105
+    created: "2025-02-15T15:07:51.850849772Z"
+    description: A Helm chart for Kubernetes
+    digest: 0e65d7453ecb21c41f848ee5c1c34942b0dbd8e783f071a617d4a11afa791c59
+    name: prowlarr
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/prowlarr-0.1.3/prowlarr-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
     appVersion: 1.23.1.4708-ls85
     created: "2024-09-16T18:52:42.690939863Z"
     description: A Helm chart for Kubernetes
@@ -658,6 +668,16 @@ entries:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/prowlarr-0.1.0/prowlarr-0.1.0.tgz
     version: 0.1.0
   qbittorrent:
+  - apiVersion: v2
+    appVersion: 5.0.3-r0-ls379
+    created: "2025-02-15T15:07:51.942505746Z"
+    description: A Helm chart for Kubernetes
+    digest: d64fe6de869f8139998fc22c39f1ca72b979b8d201ed5ae9c26d074b2531a880
+    name: qbittorrent
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/qbittorrent-0.1.10/qbittorrent-0.1.10.tgz
+    version: 0.1.10
   - apiVersion: v2
     appVersion: 4.6.6-r0-ls350
     created: "2024-09-16T18:54:06.10442906Z"
@@ -760,6 +780,16 @@ entries:
     version: 0.1.0
   radarr:
   - apiVersion: v2
+    appVersion: 5.18.4.9674-ls259
+    created: "2025-02-15T15:07:52.040374725Z"
+    description: A Helm chart for Kubernetes
+    digest: 3c1f3adbd8008ef75db367a529da8b03bbb604198164063d06f42f66c0a11f3c
+    name: radarr
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/radarr-0.1.5/radarr-0.1.5.tgz
+    version: 0.1.5
+  - apiVersion: v2
     appVersion: 5.9.1.9070-ls237
     created: "2024-09-16T19:14:43.886006153Z"
     description: A Helm chart for Kubernetes
@@ -822,6 +852,16 @@ entries:
     version: 0.1.1
   sabnzbd:
   - apiVersion: v2
+    appVersion: 4.4.1-ls202
+    created: "2025-02-15T15:07:52.134674757Z"
+    description: A Helm chart for Kubernetes
+    digest: 376aa57c00e7ddbf9ab9d8ae771381f38cf19cd74ca11ca4ae2fc641af99a427
+    name: sabnzbd
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/sabnzbd-0.1.2/sabnzbd-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
     appVersion: 4.3.3-ls181
     created: "2024-09-16T19:01:58.285156519Z"
     description: A Helm chart for Kubernetes
@@ -843,6 +883,16 @@ entries:
     version: 0.1.0
   signal-cli:
   - apiVersion: v2
+    appVersion: "0.91"
+    created: "2025-02-15T15:07:52.250610886Z"
+    description: A Helm chart for Kubernetes
+    digest: 695462fab8ef4d2161fd0c0d0cd3f89a8ea086e20f2b1e3e24592e6ae6896b0b
+    name: signal-cli
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/signal-cli-0.1.2/signal-cli-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
     appVersion: "0.89"
     created: "2024-12-12T19:18:24.729132396Z"
     description: A Helm chart for Kubernetes
@@ -863,6 +913,16 @@ entries:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/signal-cli-0.1.0/signal-cli-0.1.0.tgz
     version: 0.1.0
   sonarr:
+  - apiVersion: v2
+    appVersion: 4.0.13.2932-ls271
+    created: "2025-02-15T15:07:52.333264767Z"
+    description: A Helm chart for Kubernetes
+    digest: f866635f7592a33554c229c1ef2f0cc30314e25548635b06e3959c084ddd6073
+    name: sonarr
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/sonarr-0.1.4/sonarr-0.1.4.tgz
+    version: 0.1.4
   - apiVersion: v2
     appVersion: 4.0.9.2244-ls254
     created: "2024-09-16T19:01:58.414158015Z"
@@ -935,6 +995,28 @@ entries:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/subgen-0.1.0/subgen-0.1.0.tgz
     version: 0.1.0
   vaultwarden:
+  - apiVersion: v2
+    appVersion: 1.33.2-alpine
+    created: "2025-02-15T15:07:52.441989427Z"
+    dependencies:
+    - name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 14.3.3
+    description: vaultwarden is an unofficial Bitwarden-compatible server written
+      in Rust
+    digest: ed7e006238b56ed56b5e3c29f0559afc2d4071d63153546b4703085e4058f547
+    keywords:
+    - Rust
+    - vaultwarden
+    kubeVersion: '>=1.12.0-0'
+    name: vaultwarden
+    sources:
+    - https://github.com/guerzon/vaultwarden
+    - https://github.com/dani-garcia/vaultwarden
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.26/vaultwarden-0.22.26.tgz
+    version: 0.22.26
   - apiVersion: v2
     appVersion: 1.32.3-alpine
     created: "2024-10-30T20:12:42.346617832Z"
@@ -1375,4 +1457,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2025-02-15T01:13:07.247146226Z"
+generated: "2025-02-15T15:07:52.442256136Z"
