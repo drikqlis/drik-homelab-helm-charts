@@ -679,6 +679,16 @@ entries:
     version: 0.1.0
   qbittorrent:
   - apiVersion: v2
+    appVersion: 5.1.0-r0-ls394
+    created: "2025-05-22T18:33:23.963074346Z"
+    description: A Helm chart for Kubernetes
+    digest: 25e48f49a5d65be4acde134a188010965cd6814bdb226fb8181337302b40d49f
+    name: qbittorrent
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/qbittorrent-0.1.11/qbittorrent-0.1.11.tgz
+    version: 0.1.11
+  - apiVersion: v2
     appVersion: 5.0.3-r0-ls379
     created: "2025-02-15T15:07:51.942505746Z"
     description: A Helm chart for Kubernetes
@@ -1467,4 +1477,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2025-04-29T17:20:51.244168727Z"
+generated: "2025-05-22T18:33:23.963305347Z"
