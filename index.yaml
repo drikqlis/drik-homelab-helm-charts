@@ -3,6 +3,16 @@ entries:
   aurutils:
   - apiVersion: v2
     appVersion: latest
+    created: "2025-06-17T18:51:19.318568813Z"
+    description: A Helm chart for Kubernetes
+    digest: 0d9717c0dddc9b71414cb8494f80a89628c5632d47ecd248716c14fb3cb7d6a7
+    name: aurutils
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/aurutils-0.1.3/aurutils-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
+    appVersion: latest
     created: "2025-04-29T17:20:51.243986137Z"
     description: A Helm chart for Kubernetes
     digest: 784999b3e3489026ed6f8a127efe5c2be9e937e6f2d51cb53cdfd47c51c7c62e
@@ -1519,4 +1529,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2025-06-16T19:12:59.751291572Z"
+generated: "2025-06-17T18:51:19.318820364Z"
