@@ -43,6 +43,16 @@ entries:
     version: 0.1.0
   bazarr:
   - apiVersion: v2
+    appVersion: v1.5.2-ls310
+    created: "2025-07-07T21:29:48.37642025Z"
+    description: A Helm chart for Kubernetes
+    digest: 2986ebbb32a4e066326a03e19d8b5574f3c65d44040803f5ff8fa3d2238b0457
+    name: bazarr
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/bazarr-0.1.3/bazarr-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
     appVersion: v1.5.1-ls291
     created: "2025-02-15T00:16:00.605956764Z"
     description: A Helm chart for Kubernetes
@@ -709,6 +719,16 @@ entries:
     version: 0.1.0
   qbittorrent:
   - apiVersion: v2
+    appVersion: 5.1.2-r0-ls403
+    created: "2025-07-07T21:29:48.483664509Z"
+    description: A Helm chart for Kubernetes
+    digest: 92e9fdf5d8b66a77dfe4b4a2dc198aca81ffc2b0aa6823e96f530791e225c037
+    name: qbittorrent
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/qbittorrent-0.1.13/qbittorrent-0.1.13.tgz
+    version: 0.1.13
+  - apiVersion: v2
     appVersion: 5.1.0-r0-ls394
     created: "2025-05-22T20:19:32.30654839Z"
     description: A Helm chart for Kubernetes
@@ -839,6 +859,16 @@ entries:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/qbittorrent-0.1.0/qbittorrent-0.1.0.tgz
     version: 0.1.0
   radarr:
+  - apiVersion: v2
+    appVersion: 5.26.2.10099-ls277
+    created: "2025-07-07T21:29:48.60532432Z"
+    description: A Helm chart for Kubernetes
+    digest: 78b0cb4f1de395a4875e5a9c7c5fbf77394f3a754f8486e5736ff39943b20e7b
+    name: radarr
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/radarr-0.1.6/radarr-0.1.6.tgz
+    version: 0.1.6
   - apiVersion: v2
     appVersion: 5.18.4.9674-ls259
     created: "2025-02-15T15:07:52.040374725Z"
@@ -973,6 +1003,16 @@ entries:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/signal-cli-0.1.0/signal-cli-0.1.0.tgz
     version: 0.1.0
   sonarr:
+  - apiVersion: v2
+    appVersion: 4.0.15.2941-ls287
+    created: "2025-07-07T21:29:48.742727769Z"
+    description: A Helm chart for Kubernetes
+    digest: 5fd8b2ba33a13438fee2ad4d91867e4a33d554ea9a75ff08a82359ca7805ed73
+    name: sonarr
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/sonarr-0.1.5/sonarr-0.1.5.tgz
+    version: 0.1.5
   - apiVersion: v2
     appVersion: 4.0.13.2932-ls271
     created: "2025-02-15T15:07:52.333264767Z"
@@ -1539,4 +1579,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2025-07-07T21:25:35.562397552Z"
+generated: "2025-07-07T21:29:48.743295419Z"
