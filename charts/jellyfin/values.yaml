@@ -128,10 +128,14 @@ livenessProbe:
   httpGet:
     path: /
     port: 8096
+  failureThreshold: 1800
+  periodSeconds: 360
 readinessProbe:
   httpGet:
     path: /
     port: 8096
+  failureThreshold: 1800
+  periodSeconds: 360
 
 autoscaling:
   enabled: false
