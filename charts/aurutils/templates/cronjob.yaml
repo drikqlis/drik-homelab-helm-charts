@@ -1,0 +1,51 @@
+{{- if .Values.autoSync.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "aurutils.fullname" . }}-sync
+  labels:
+    {{- include "aurutils.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.autoSync.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "aurutils.labels" . | nindent 12 }}
+        spec:
+          restartPolicy: OnFailure
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          containers:
+          - name: aur-sync
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            command: ["/auto_sync.sh"]
+            securityContext:
+              {{- toYaml .Values.securityContext | nindent 14 }}
+            volumeMounts:
+            - name: repo
+              mountPath: /repo
+            resources:
+              requests:
+                memory: 512Mi
+              limits:
+                memory: 5Gi
+          volumes:
+          - name: repo
+            {{- if .Values.persistence.repo.enabled }}
+            persistentVolumeClaim:
+              claimName: {{ .Values.persistence.repo.existingClaim | default (include "aurutils.fullname" .) }}
+            {{- else }}
+            emptyDir: {}
+            {{- end }}
+
+{{- end }}

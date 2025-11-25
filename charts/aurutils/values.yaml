@@ -145,3 +145,9 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# Automated package sync configuration
+autoSync:
+  enabled: true
+  # Cron schedule (default: daily at 02:00)
+  schedule: "0 2 * * *"
