@@ -43,7 +43,7 @@ spec:
           - name: repo
             {{- if .Values.persistence.repo.enabled }}
             persistentVolumeClaim:
-              claimName: {{ .Values.persistence.repo.existingClaim | default (include "aurutils.fullname" .) }}
+              claimName: {{ if .Values.persistence.repo.existingClaim }}{{ .Values.persistence.repo.existingClaim }}{{- else }}{{ template "aurutils.fullname" . }}-repo{{- end }}
             {{- else }}
             emptyDir: {}
             {{- end }}
