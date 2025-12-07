@@ -1042,6 +1042,17 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/signal-cli-0.1.0/signal-cli-0.1.0.tgz
     version: 0.1.0
+  solar-creeper:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2025-12-07T17:01:16.949825001Z"
+    description: A Helm chart for Solar Creeper static web application
+    digest: 98a9e6b628a465e73e347e9e23d98119551745ca694ebed9fff00d2d4fc53656
+    name: solar-creeper
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/solar-creeper-0.1.0/solar-creeper-0.1.0.tgz
+    version: 0.1.0
   sonarr:
   - apiVersion: v2
     appVersion: 4.0.15.2941-ls287
@@ -1619,4 +1630,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2025-11-26T19:24:12.743487049Z"
+generated: "2025-12-07T17:01:16.950074797Z"
