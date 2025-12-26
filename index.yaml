@@ -1652,4 +1652,21 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/vaultwarden-0.22.6/vaultwarden-0.22.6.tgz
     version: 0.22.6
-generated: "2025-12-22T23:01:25.041305142Z"
+  wish-journal:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2025-12-26T19:51:27.51856959Z"
+    description: A password-protected blog reading markdown from local filesystem
+    digest: a2f1d90f6b616f71a4b83c6096b4fa54f7ec7fa21c11fce653752543cfd2e769
+    keywords:
+    - blog
+    - flask
+    - markdown
+    name: wish-journal
+    sources:
+    - https://github.com/drikqlis/wish-journal
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/wish-journal-0.1.0/wish-journal-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-12-26T19:51:27.518834666Z"
