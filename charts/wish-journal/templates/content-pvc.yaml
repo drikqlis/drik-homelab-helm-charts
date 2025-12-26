@@ -1,0 +1,21 @@
+{{- if and .Values.persistence.content.enabled (not .Values.persistence.content.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "wish-journal.fullname" . }}-content
+  labels:
+    {{- include "wish-journal.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.content.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.content.size | quote }}
+  {{- if .Values.persistence.content.storageClass }}
+  {{- if (eq "-" .Values.persistence.content.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.persistence.content.storageClass | quote }}
+  {{- end }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,49 @@
+Wish Journal has been installed.
+
+1. Access the application:
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}
+{{- end }}
+{{- else if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "wish-journal.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "wish-journal.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.service.port }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "wish-journal.fullname" . }} 5000:{{ .Values.service.port }}
+  echo http://localhost:5000
+{{- end }}
+
+2. Adding users:
+   Connect to the pod and use Python:
+
+   kubectl exec -it deployment/{{ include "wish-journal.fullname" . }} -n {{ .Release.Namespace }} -- python3 << 'EOF'
+   import sqlite3, bcrypt
+   conn = sqlite3.connect('/data/wish-journal.db')
+   password_hash = bcrypt.hashpw(b'PASSWORD', bcrypt.gensalt())
+   conn.execute('INSERT INTO users (first_name, last_name, username, password_hash) VALUES (?, ?, ?, ?)',
+                ('FirstName', 'LastName', 'username', password_hash.decode()))
+   conn.commit()
+   print('User created!')
+   EOF
+
+3. Content directory structure:
+   /content/
+   ├── posts/
+   │   └── my-post.md
+   └── media/
+       ├── images/
+       ├── audio/
+       └── video/
+
+4. Post format (YAML frontmatter):
+   ---
+   title: "Post title"
+   date: 2024-01-15
+   author: "Author"
+   ---
+
+   Content in markdown...

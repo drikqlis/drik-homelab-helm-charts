@@ -1,0 +1,12 @@
+apiVersion: v2
+name: wish-journal
+description: A password-protected blog reading markdown from local filesystem
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - blog
+  - flask
+  - markdown
+sources:
+  - https://github.com/drikqlis/wish-journal
