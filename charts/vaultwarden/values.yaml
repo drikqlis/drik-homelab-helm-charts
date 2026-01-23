@@ -666,3 +666,5 @@ global:
       username: user
 postgresql:
   clusterDomain: cluster.local
+  image:
+    repository: bitnamilegacy/postgresql
