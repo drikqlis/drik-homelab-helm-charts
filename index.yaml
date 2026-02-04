@@ -453,6 +453,17 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/dagonite-empire-0.1.6/dagonite-empire-0.1.6.tgz
     version: 0.1.6
+  jagodanki:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-02-04T22:46:14.962241615Z"
+    description: A Helm chart for Jagodanki Flask web application
+    digest: 703e463f6edd2edd14c600ddb389c6bbcf97d77858ee5fc7ff92ff12b2c8b7d7
+    name: jagodanki
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/jagodanki-0.1.0/jagodanki-0.1.0.tgz
+    version: 0.1.0
   jellyfin:
   - apiVersion: v2
     appVersion: 10.11.2
@@ -1713,4 +1724,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/wish-journal-0.1.0/wish-journal-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-23T02:29:31.683324098Z"
+generated: "2026-02-04T22:46:14.962536061Z"
