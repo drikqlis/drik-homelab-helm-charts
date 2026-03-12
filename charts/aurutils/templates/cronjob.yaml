@@ -12,12 +12,13 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      backoffLimit: 0
       template:
         metadata:
           labels:
             {{- include "aurutils.labels" . | nindent 12 }}
         spec:
-          restartPolicy: OnFailure
+          restartPolicy: Never
           {{- with .Values.imagePullSecrets }}
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}
@@ -38,7 +39,7 @@ spec:
               requests:
                 memory: 512Mi
               limits:
-                memory: 5Gi
+                memory: 6Gi
           volumes:
           - name: repo
             {{- if .Values.persistence.repo.enabled }}
