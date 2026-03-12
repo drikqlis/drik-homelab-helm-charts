@@ -3,6 +3,16 @@ entries:
   aurutils:
   - apiVersion: v2
     appVersion: latest
+    created: "2026-03-12T20:11:23.455697517Z"
+    description: A Helm chart for Kubernetes
+    digest: 7a98c8ea1e7f3b8ecadd2b91d56a9bf344579d95cbe3141a9d51da6b39968d07
+    name: aurutils
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/aurutils-0.1.7/aurutils-0.1.7.tgz
+    version: 0.1.7
+  - apiVersion: v2
+    appVersion: latest
     created: "2025-11-26T19:24:12.743206053Z"
     description: A Helm chart for Kubernetes
     digest: c6b03ab97b854fffbad2f2970d2c7665c1fbeeebe7fe43a9c281962314f8f5f3
@@ -1724,4 +1734,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/wish-journal-0.1.0/wish-journal-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-04T22:46:14.962536061Z"
+generated: "2026-03-12T20:11:23.45598244Z"
