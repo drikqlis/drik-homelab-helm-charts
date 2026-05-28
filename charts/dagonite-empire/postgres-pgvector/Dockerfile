@@ -13,9 +13,12 @@ USER root
 RUN install_packages git build-essential ca-certificates
 ARG PGVECTOR_VERSION=v0.8.0
 WORKDIR /tmp/pgvector
+# OPTFLAGS="" disables pgvector's default `-march=native`, which would otherwise
+# bake in the build host's CPU features (e.g. AVX-512 on GitHub runners) and
+# cause `SIGILL: Illegal instruction` on older target CPUs.
 RUN git clone --branch ${PGVECTOR_VERSION} --depth 1 https://github.com/pgvector/pgvector.git . \
- && make PG_CONFIG=/opt/bitnami/postgresql/bin/pg_config \
- && make install PG_CONFIG=/opt/bitnami/postgresql/bin/pg_config
+ && make OPTFLAGS="" PG_CONFIG=/opt/bitnami/postgresql/bin/pg_config \
+ && make OPTFLAGS="" install PG_CONFIG=/opt/bitnami/postgresql/bin/pg_config
 
 FROM bitnamilegacy/postgresql:${BITNAMI_TAG}
 COPY --from=builder /opt/bitnami/postgresql/lib/vector.so \

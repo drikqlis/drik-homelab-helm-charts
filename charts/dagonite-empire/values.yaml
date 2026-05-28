@@ -163,4 +163,4 @@ global:
       postgresPassword: pass
       username: user
       password: pass
-      database: dagonitdb
+      database: dagonitedb
