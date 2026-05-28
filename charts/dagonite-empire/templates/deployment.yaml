@@ -95,6 +95,11 @@ spec:
                 key: enable_ssl
           - name: ASPNETCORE_ENVIRONMENT
             value: "{{ .Values.aspnetcoreEnvironment }}"
+          - name: AutoMapper__LicenseKey
+            valueFrom:
+              secretKeyRef:
+                name: connection-string-secret
+                key: automapper-license-key
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

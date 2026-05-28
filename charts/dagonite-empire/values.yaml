@@ -152,6 +152,10 @@ aspnetcoreEnvironment: Production
 # debug errors
 detailedErrors: false
 
+# AutoMapper license key
+autoMapper:
+  licenseKey: ""
+
 # postgresql settings
 global:
   postgresql:
