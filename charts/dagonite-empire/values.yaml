@@ -111,6 +111,18 @@ persistence:
     # subPath: some-subpath
     accessMode: ReadWriteOnce
     size: 1Gi
+  ## Dedicated tiny PVC mounted at /app/Resources for SCRIBE assets
+  ## (persona file, etc.). Kept separate from `upload` because /app/wwwroot/upload
+  ## is served as static files by the .NET app — anything dropped there is public.
+  ## The /app/Resources directory is otherwise empty in the published image,
+  ## so the PVC mount does not shadow any application code.
+  scribeResources:
+    enabled: false
+    # storageClass: "-"
+    # existingClaim: your-claim
+    accessMode: ReadWriteOnce
+    size: 256Mi
+    mountPath: /app/Resources
 
 # Additional volumes on the output Deployment definition.
 extraVolumes: []
@@ -164,3 +176,31 @@ global:
       username: user
       password: pass
       database: dagonitedb
+
+# SCRIBE (AI memory) settings
+# Talks to an Ollama-compatible server outside the cluster (e.g. host machine on LAN).
+# All values can be overridden via the scribe-config-secret (rendered from these values).
+scribe:
+  # Enable/disable injection of SCRIBE env vars into the deployment.
+  # When false, the app uses ScribeOptions defaults (localhost:11434).
+  enabled: false
+  ollama:
+    # Full base URL where Ollama is reachable from the cluster.
+    # Example: "http://192.168.1.20:11434"
+    baseUrl: ""
+    embeddingModel: "nomic-embed-text"
+    chatModel: "gemma2:9b"
+    temperature: "0.7"
+    maxTokens: "2048"
+    timeoutSeconds: "120"
+  # Path inside the container where the persona file is read from.
+  # Provide the file via the scribeResources PVC (e.g. `kubectl cp` it in)
+  # mounted at /app/Resources by default. Empty string disables file lookup
+  # and the app falls back to systemPrompt below.
+  personaFilePath: "/app/Resources/scribe-persona.md"
+  # Fallback system prompt used only when the persona file at personaFilePath
+  # is missing or empty.
+  systemPrompt: ""
+  search:
+    topK: "5"
+    similarityThreshold: "0.5"

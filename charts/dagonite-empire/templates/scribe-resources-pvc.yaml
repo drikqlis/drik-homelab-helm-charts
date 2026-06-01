@@ -1,0 +1,24 @@
+{{- if and .Values.persistence.scribeResources.enabled (not .Values.persistence.scribeResources.existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "dagonite-empire.fullname" . }}-scribe-resources
+  labels:
+    app.kubernetes.io/name: {{ include "dagonite-empire.name" . }}
+    helm.sh/chart: {{ include "dagonite-empire.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.scribeResources.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.scribeResources.size | quote }}
+{{- if .Values.persistence.scribeResources.storageClass }}
+{{- if (eq "-" .Values.persistence.scribeResources.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.persistence.scribeResources.storageClass }}"
+{{- end }}
+{{- end }}
+{{- end -}}

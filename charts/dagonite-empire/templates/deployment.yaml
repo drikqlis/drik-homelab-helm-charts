@@ -100,6 +100,58 @@ spec:
               secretKeyRef:
                 name: connection-string-secret
                 key: automapper-license-key
+          {{- if .Values.scribe.enabled }}
+          - name: Scribe__Ollama__BaseUrl
+            valueFrom:
+              secretKeyRef:
+                name: scribe-config-secret
+                key: base-url
+          - name: Scribe__Ollama__EmbeddingModel
+            valueFrom:
+              secretKeyRef:
+                name: scribe-config-secret
+                key: embedding-model
+          - name: Scribe__Ollama__ChatModel
+            valueFrom:
+              secretKeyRef:
+                name: scribe-config-secret
+                key: chat-model
+          - name: Scribe__Ollama__Temperature
+            valueFrom:
+              secretKeyRef:
+                name: scribe-config-secret
+                key: temperature
+          - name: Scribe__Ollama__MaxTokens
+            valueFrom:
+              secretKeyRef:
+                name: scribe-config-secret
+                key: max-tokens
+          - name: Scribe__Ollama__TimeoutSeconds
+            valueFrom:
+              secretKeyRef:
+                name: scribe-config-secret
+                key: timeout-seconds
+          - name: Scribe__Ollama__PersonaFilePath
+            valueFrom:
+              secretKeyRef:
+                name: scribe-config-secret
+                key: persona-file-path
+          - name: Scribe__Ollama__SystemPrompt
+            valueFrom:
+              secretKeyRef:
+                name: scribe-config-secret
+                key: system-prompt
+          - name: Scribe__Search__TopK
+            valueFrom:
+              secretKeyRef:
+                name: scribe-config-secret
+                key: top-k
+          - name: Scribe__Search__SimilarityThreshold
+            valueFrom:
+              secretKeyRef:
+                name: scribe-config-secret
+                key: similarity-threshold
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -116,6 +168,10 @@ spec:
             {{- if .Values.persistence.upload.subPath }}
               subPath: {{ .Values.persistence.upload.subPath }}
             {{- end }}
+            {{- if .Values.persistence.scribeResources.enabled }}
+            - name: scribe-resources
+              mountPath: {{ .Values.persistence.scribeResources.mountPath }}
+            {{- end }}
             {{- range .Values.persistence.extraExistingClaimMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
@@ -131,6 +187,11 @@ spec:
             claimName: {{ if .Values.persistence.upload.existingClaim }}{{ .Values.persistence.upload.existingClaim }}{{- else }}{{ template "dagonite-empire.fullname" . }}-upload{{- end }}
         {{- else }}
           emptyDir: {}
+        {{- end }}
+        {{- if .Values.persistence.scribeResources.enabled }}
+        - name: scribe-resources
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.scribeResources.existingClaim }}{{ .Values.persistence.scribeResources.existingClaim }}{{- else }}{{ template "dagonite-empire.fullname" . }}-scribe-resources{{- end }}
         {{- end }}
         {{- range .Values.persistence.extraExistingClaimMounts }}
         - name: {{ .name }}
