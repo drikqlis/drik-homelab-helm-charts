@@ -100,6 +100,18 @@ spec:
               secretKeyRef:
                 name: connection-string-secret
                 key: automapper-license-key
+          {{- if and .Values.webPush.publicKey .Values.webPush.privateKey }}
+          - name: WebPush__PublicKey
+            valueFrom:
+              secretKeyRef:
+                name: webpush-config-secret
+                key: public-key
+          - name: WebPush__PrivateKey
+            valueFrom:
+              secretKeyRef:
+                name: webpush-config-secret
+                key: private-key
+          {{- end }}
           {{- if .Values.scribe.enabled }}
           - name: Scribe__Ollama__BaseUrl
             valueFrom:
