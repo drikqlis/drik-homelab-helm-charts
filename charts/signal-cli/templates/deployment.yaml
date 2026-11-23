@@ -15,10 +15,13 @@ spec:
       {{- include "signal-cli.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        {{- if .Values.proxy.enabled }}
+        checksum/proxy: {{ .Files.Get "files/auth-proxy.py" | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "signal-cli.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
@@ -48,7 +51,7 @@ spec:
             value: {{ .Values.autoReceiveSchedule }}
           {{- end }}
           ports:
-            - name: http
+            - name: {{ if .Values.proxy.enabled }}api{{ else }}http{{ end }}
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
@@ -71,7 +74,53 @@ spec:
             {{- if .Values.extraVolumeMounts }}
             {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
             {{- end }}
+        {{- if .Values.proxy.enabled }}
+        - name: proxy
+          image: {{ .Values.proxy.image }}
+          command: ["python3", "-I", "/proxy/auth-proxy.py"]
+          env:
+            - name: PORT
+              value: {{ .Values.proxy.port | quote }}
+            - name: UPSTREAM_PORT
+              value: {{ .Values.service.port | quote }}
+            - name: TOKENS_FILE
+              value: /etc/signal-cli-proxy/tokens.json
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+          ports:
+            - name: http
+              containerPort: {{ .Values.proxy.port }}
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /v1/health
+              port: http
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            {{- toYaml .Values.proxy.resources | nindent 12 }}
+          volumeMounts:
+            - name: proxy-script
+              mountPath: /proxy
+              readOnly: true
+            - name: proxy-tokens
+              mountPath: /etc/signal-cli-proxy
+              readOnly: true
+        {{- end }}
       volumes:
+        {{- if .Values.proxy.enabled }}
+        - name: proxy-script
+          configMap:
+            name: {{ include "signal-cli.fullname" . }}-proxy
+        - name: proxy-tokens
+          secret:
+            secretName: {{ required "proxy.tokensSecret is required" .Values.proxy.tokensSecret }}
+        {{- end }}
         - name: config
         {{- if .Values.persistence.config.enabled }}
           persistentVolumeClaim:

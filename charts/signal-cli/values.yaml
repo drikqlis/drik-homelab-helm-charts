@@ -129,3 +129,15 @@ affinity: {}
 mode: normal
 
 autoReceiveSchedule: 0 19 * * *
+
+# Token proxy (files/auth-proxy.py) in front of the API, which has no auth. When enabled, the Service/Ingress go to
+# the proxy and a NetworkPolicy leaves only the proxy's port reachable from outside the pod.
+# tokensSecret: Secret with key tokens.json, {"<sha256 hex of token>": rule}; rule = {"name", "number",
+# "recipients": [...]} (send/react to those, receive for number) or {"name", "admin": true} (everything).
+# Clients send "Authorization: Bearer <token>".
+proxy:
+  enabled: false
+  image: python:3.13-alpine
+  port: 8081
+  tokensSecret: ""
+  resources: {}
