@@ -5,7 +5,7 @@ import asyncio, hashlib, json, os, socket, subprocess, sys, tempfile, threading,
 
 HERE = os.path.dirname(os.path.realpath(__file__))
 ME, BOT, OTHER = "+48111", "+48222", "+48333"
-TOK, ADMIN, NARROW, GRP = "t0ken", "adm1n", "n4rrow", "gr0up"
+TOK, ADMIN, NARROW, GRP, DEL = "t0ken", "adm1n", "n4rrow", "gr0up", "d3l"
 G = "group.abc="
 seen = []  # request heads+bodies the upstream got
 
@@ -64,6 +64,8 @@ class Proxy(unittest.TestCase):
                    hashlib.sha256(ADMIN.encode()).hexdigest(): {"name": "admin", "admin": True},
                    hashlib.sha256(NARROW.encode()).hexdigest(): {"name": "dagonite", "number": BOT, "recipients": [ME],
                                                                  "allow": ["send"]},
+                   hashlib.sha256(DEL.encode()).hexdigest(): {"name": "del", "number": BOT, "recipients": [ME],
+                                                              "allow": ["send", "delete"]},
                    hashlib.sha256(GRP.encode()).hexdigest(): {"name": "grp", "number": BOT, "recipients": [G],
                                                               "allow": ["send", "read", "groups"]}},
                   open(cls.tokens, "w"))
@@ -148,6 +150,13 @@ class Proxy(unittest.TestCase):
         self.assertEqual(req("GET", f"/v1/groups/{BOT}"), 403)
         self.assertEqual(req("POST", f"/v1/groups/{BOT}/{G}/join", {}), 403)
         self.assertEqual(req("DELETE", f"/v1/reactions/{BOT}", {"recipient": ME}), 200)
+
+    def test_delete_only_when_allowed(self):
+        body = {"recipient": ME, "timestamp": 1}
+        self.assertEqual(req("DELETE", f"/v1/remote-delete/{BOT}", body), 403)  # default allow: no delete
+        self.assertEqual(req("DELETE", f"/v1/remote-delete/{BOT}", body, token=DEL), 200)
+        self.assertEqual(req("DELETE", f"/v1/remote-delete/{BOT}", {"recipient": OTHER, "timestamp": 1}, token=DEL), 403)
+        self.assertEqual(req("DELETE", f"/v1/remote-delete/{OTHER}", body, token=DEL), 403)
 
     def test_listed_group(self):
         self.assertEqual(req("POST", "/v2/send", {"number": BOT, "recipients": [G]}, token=GRP), 200)

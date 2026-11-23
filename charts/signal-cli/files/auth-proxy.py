@@ -8,6 +8,7 @@ Tokens: $TOKENS_FILE (Secret from values proxy.tokens, or proxy.tokensSecret), J
   allow (default send, react, receive), each only for <number>:
     send     POST /v2/send                         sender <number>, every recipient in recipients
     react    POST|DELETE /v1/reactions/<number>    recipient in recipients
+    delete   DELETE /v1/remote-delete/<number>     delete for everyone, recipient in recipients (not default)
     receive  GET /v1/receive/<number>              websocket: ALL incoming messages of the account
     read     GET /v1/contacts/<number>, GET /v1/groups/<number>[/<group id>]
     groups   POST /v1/groups/<number>/<group id>/join|quit, for group ids in recipients
@@ -65,6 +66,8 @@ def allowed(method, path, body, rule):
         return "send" in allow and b.get("number") == num and isinstance(r, list) and bool(r) and set(r) <= rcpt
     if method in ("POST", "DELETE") and path == f"/v1/reactions/{num}":
         return "react" in allow and b.get("recipient") in rcpt
+    if method == "DELETE" and path == f"/v1/remote-delete/{num}":
+        return "delete" in allow and b.get("recipient") in rcpt
     return False
 
 

@@ -134,7 +134,8 @@ autoReceiveSchedule: 0 19 * * *
 # the proxy and a NetworkPolicy leaves only the proxy's port reachable from outside the pod.
 # tokens: {"<sha256 hex of token>": rule}; rule = {name, number, recipients: [...], allow: [...]} or
 # {name, admin: true} (everything). allow (default [send, react, receive]), all for <number> only:
-#   send: messages to recipients; react: reactions to recipients; receive: websocket, ALL incoming messages;
+#   send: messages (and edits) to recipients; react: reactions to recipients; receive: websocket, ALL incoming
+#   messages; delete: delete-for-everyone in chats with recipients (not in the default);
 #   read: GET contacts/groups; groups: join/quit the groups listed in recipients.
 # Groups are recipients too: "group.<id>" as GET /v1/groups lists it. Clients send "Authorization: Bearer <token>".
 # Put them in secret values (the chart renders them into a Secret), or point tokensSecret at an existing Secret
