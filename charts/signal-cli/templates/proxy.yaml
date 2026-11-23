@@ -8,6 +8,17 @@ metadata:
 data:
   auth-proxy.py: |-
 {{ .Files.Get "files/auth-proxy.py" | indent 4 }}
+{{- if .Values.proxy.tokens }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "signal-cli.fullname" . }}-proxy-tokens
+  labels:
+    {{- include "signal-cli.labels" . | nindent 4 }}
+stringData:
+  tokens.json: {{ .Values.proxy.tokens | toJson | quote }}
+{{- end }}
 ---
 # signal-cli-rest-api has no auth and listens on every interface: only the proxy's port may be reached
 apiVersion: networking.k8s.io/v1

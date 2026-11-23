@@ -2,7 +2,7 @@
 """Token proxy in front of signal-cli-rest-api (which has no auth and listens on every interface; the chart's
 NetworkPolicy leaves only this proxy's port reachable). Stdlib only.
 
-Tokens: $TOKENS_FILE (a Secret), JSON {"<sha256 hex of the token>": rule}, re-read on every request. Rule:
+Tokens: $TOKENS_FILE (Secret from values proxy.tokens, or proxy.tokensSecret), JSON {"<sha256 hex of the token>": rule}, re-read on every request. Rule:
   {"name": "claude", "number": "+48...", "recipients": ["+48..."]}   only:
     GET  /v1/receive/<number>        (websocket: incoming messages)
     POST /v2/send                    number == <number>, every recipient in recipients (no groups)
