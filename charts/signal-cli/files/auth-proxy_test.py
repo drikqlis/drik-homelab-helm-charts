@@ -5,7 +5,8 @@ import asyncio, hashlib, json, os, socket, subprocess, sys, tempfile, threading,
 
 HERE = os.path.dirname(os.path.realpath(__file__))
 ME, BOT, OTHER = "+48111", "+48222", "+48333"
-TOK, ADMIN = "t0ken", "adm1n"
+TOK, ADMIN, NARROW, GRP = "t0ken", "adm1n", "n4rrow", "gr0up"
+G = "group.abc="
 seen = []  # request heads+bodies the upstream got
 
 
@@ -60,7 +61,12 @@ class Proxy(unittest.TestCase):
         threading.Thread(target=run_upstream, daemon=True).start()
         cls.tokens = os.path.join(tempfile.mkdtemp(), "tokens.json")
         json.dump({hashlib.sha256(TOK.encode()).hexdigest(): {"name": "claude", "number": BOT, "recipients": [ME]},
-                   hashlib.sha256(ADMIN.encode()).hexdigest(): {"name": "admin", "admin": True}}, open(cls.tokens, "w"))
+                   hashlib.sha256(ADMIN.encode()).hexdigest(): {"name": "admin", "admin": True},
+                   hashlib.sha256(NARROW.encode()).hexdigest(): {"name": "dagonite", "number": BOT, "recipients": [ME],
+                                                                 "allow": ["send"]},
+                   hashlib.sha256(GRP.encode()).hexdigest(): {"name": "grp", "number": BOT, "recipients": [G],
+                                                              "allow": ["send", "read", "groups"]}},
+                  open(cls.tokens, "w"))
         cls.p = subprocess.Popen([sys.executable, "-I", os.path.join(HERE, "auth-proxy.py")],
                                  env=dict(os.environ, PORT=str(PX), UPSTREAM_PORT=str(UP), TOKENS_FILE=cls.tokens),
                                  stdout=subprocess.DEVNULL)
@@ -131,6 +137,32 @@ class Proxy(unittest.TestCase):
 
     def test_admin_passes_everything(self):
         self.assertEqual(req("POST", f"/v1/groups/{BOT}/g/quit", {}, token=ADMIN), 200)
+
+    def test_allow_send_only(self):
+        self.assertEqual(req("POST", "/v2/send", {"number": BOT, "recipients": [ME]}, token=NARROW), 200)
+        self.assertEqual(req("POST", f"/v1/reactions/{BOT}", {"recipient": ME}, token=NARROW), 403)
+        self.assertEqual(req("GET", f"/v1/receive/{BOT}", token=NARROW), 403)
+        self.assertEqual(req("GET", f"/v1/contacts/{BOT}", token=NARROW), 403)
+
+    def test_default_allow_has_no_read_or_groups(self):
+        self.assertEqual(req("GET", f"/v1/groups/{BOT}"), 403)
+        self.assertEqual(req("POST", f"/v1/groups/{BOT}/{G}/join", {}), 403)
+        self.assertEqual(req("DELETE", f"/v1/reactions/{BOT}", {"recipient": ME}), 200)
+
+    def test_listed_group(self):
+        self.assertEqual(req("POST", "/v2/send", {"number": BOT, "recipients": [G]}, token=GRP), 200)
+        self.assertEqual(req("POST", "/v2/send", {"number": BOT, "recipients": ["group.other"]}, token=GRP), 403)
+        self.assertEqual(req("POST", f"/v1/groups/{BOT}/{G}/join", {}, token=GRP), 200)
+        self.assertEqual(req("POST", f"/v1/groups/{BOT}/{G}/quit", {}, token=GRP), 200)
+        self.assertEqual(req("POST", f"/v1/groups/{BOT}/group.other/join", {}, token=GRP), 403)
+        self.assertEqual(req("POST", f"/v1/groups/{BOT}/{G}/members", {}, token=GRP), 403)
+        self.assertEqual(req("POST", f"/v1/groups/{OTHER}/{G}/join", {}, token=GRP), 403)
+
+    def test_read(self):
+        for p in (f"/v1/contacts/{BOT}", f"/v1/groups/{BOT}", f"/v1/groups/{BOT}/{G}"):
+            self.assertEqual(req("GET", p, token=GRP), 200, p)
+        for p in (f"/v1/groups/{OTHER}", f"/v1/groups/{BOT}/{G}/x", f"/v1/accounts/{BOT}", f"/v1/contacts/{BOT}/x/y"):
+            self.assertEqual(req("GET", p, token=GRP), 403, p)
 
     def test_websocket_receive(self):
         with socket.create_connection(("127.0.0.1", PX), timeout=5) as s:

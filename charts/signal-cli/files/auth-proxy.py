@@ -2,11 +2,16 @@
 """Token proxy in front of signal-cli-rest-api (which has no auth and listens on every interface; the chart's
 NetworkPolicy leaves only this proxy's port reachable). Stdlib only.
 
-Tokens: $TOKENS_FILE (Secret from values proxy.tokens, or proxy.tokensSecret), JSON {"<sha256 hex of the token>": rule}, re-read on every request. Rule:
-  {"name": "claude", "number": "+48...", "recipients": ["+48..."]}   only:
-    GET  /v1/receive/<number>        (websocket: incoming messages)
-    POST /v2/send                    number == <number>, every recipient in recipients (no groups)
-    POST /v1/reactions/<number>      recipient in recipients
+Tokens: $TOKENS_FILE (Secret from values proxy.tokens, or proxy.tokensSecret), JSON
+{"<sha256 hex of the token>": rule}, re-read on every request. Rule:
+  {"name": "claude", "number": "+48...", "recipients": ["+48...", "group.<id>"], "allow": [...]}
+  allow (default send, react, receive), each only for <number>:
+    send     POST /v2/send                         sender <number>, every recipient in recipients
+    react    POST|DELETE /v1/reactions/<number>    recipient in recipients
+    receive  GET /v1/receive/<number>              websocket: ALL incoming messages of the account
+    read     GET /v1/contacts/<number>, GET /v1/groups/<number>[/<group id>]
+    groups   POST /v1/groups/<number>/<group id>/join|quit, for group ids in recipients
+  A group is a recipient like a number ("group.<id>", as /v1/groups lists it).
   {"name": "admin", "admin": true}  everything
 GET /v1/health needs no token (probes). Anything else: 403. Client sends "Authorization: Bearer <token>".
 One request per connection (Connection: close upstream), so nothing unchecked can follow a checked request.
@@ -32,12 +37,23 @@ def rule_for(token):
     return next((r for k, r in rules.items() if hmac.compare_digest(k, h)), None)
 
 
+DEFAULT_ALLOW = ("send", "react", "receive")
+
+
 def allowed(method, path, body, rule):
     if rule.get("admin"):
         return True
     num, rcpt = rule.get("number"), set(rule.get("recipients") or [])
-    if method == "GET" and path == f"/v1/receive/{num}":
-        return True
+    allow = set(rule.get("allow") or DEFAULT_ALLOW)
+    if method == "GET":
+        if path == f"/v1/receive/{num}":
+            return "receive" in allow
+        parts = path.split("/")  # "", v1, groups|contacts, <num>[, <group id>]
+        return "read" in allow and parts[1:4] in (["v1", "contacts", num], ["v1", "groups", num]) and len(parts) <= 5
+    if method == "POST" and "groups" in allow:
+        parts = path.split("/")
+        if len(parts) == 6 and parts[1:4] == ["v1", "groups", num] and parts[5] in ("join", "quit"):
+            return parts[4].startswith("group.") and parts[4] in rcpt
     try:
         b = json.loads(body or b"{}")
     except ValueError:
@@ -46,9 +62,9 @@ def allowed(method, path, body, rule):
         return False
     if method == "POST" and path == "/v2/send":
         r = b.get("recipients")
-        return b.get("number") == num and isinstance(r, list) and bool(r) and set(r) <= rcpt
-    if method == "POST" and path == f"/v1/reactions/{num}":
-        return b.get("recipient") in rcpt
+        return "send" in allow and b.get("number") == num and isinstance(r, list) and bool(r) and set(r) <= rcpt
+    if method in ("POST", "DELETE") and path == f"/v1/reactions/{num}":
+        return "react" in allow and b.get("recipient") in rcpt
     return False
 
 
