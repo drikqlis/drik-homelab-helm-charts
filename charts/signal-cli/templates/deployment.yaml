@@ -43,8 +43,10 @@ spec:
             value: Etc/UTC
           - name: MODE
             value: {{ .Values.mode | default "normal" }}
+          {{- if and .Values.autoReceiveSchedule (ne (.Values.mode | default "normal") "json-rpc") }}
           - name: AUTO_RECEIVE_SCHEDULE
             value: {{ .Values.autoReceiveSchedule }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

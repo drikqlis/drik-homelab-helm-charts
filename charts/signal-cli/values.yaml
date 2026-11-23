@@ -125,7 +125,7 @@ tolerations: []
 
 affinity: {}
 
-# normal: one signal-cli run per request; json-rpc: resident daemon, incoming messages via websocket /v1/receive/{number}
+# normal: one signal-cli run per request; json-rpc: resident daemon, incoming messages via websocket /v1/receive/{number} (autoReceiveSchedule is ignored in json-rpc: the image refuses it)
 mode: normal
 
 autoReceiveSchedule: 0 19 * * *
