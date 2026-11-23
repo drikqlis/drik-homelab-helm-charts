@@ -41,7 +41,7 @@ spec:
           env:
           - name: TZ
             value: Etc/UTC
-          - name: mode
+          - name: MODE
             value: {{ .Values.mode | default "normal" }}
           - name: AUTO_RECEIVE_SCHEDULE
             value: {{ .Values.autoReceiveSchedule }}
