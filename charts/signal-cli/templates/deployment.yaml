@@ -119,7 +119,10 @@ spec:
             name: {{ include "signal-cli.fullname" . }}-proxy
         - name: proxy-tokens
           secret:
-            secretName: {{ required "proxy.tokensSecret is required" .Values.proxy.tokensSecret }}
+            {{- if not (or .Values.proxy.tokens .Values.proxy.tokensSecret) }}
+            {{- fail "proxy.enabled needs proxy.tokens or proxy.tokensSecret" }}
+            {{- end }}
+            secretName: {{ .Values.proxy.tokensSecret | default (printf "%s-proxy-tokens" (include "signal-cli.fullname" .)) }}
         {{- end }}
         - name: config
         {{- if .Values.persistence.config.enabled }}
