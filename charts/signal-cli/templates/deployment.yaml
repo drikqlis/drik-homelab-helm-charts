@@ -35,6 +35,23 @@ spec:
       serviceAccountName: {{ include "signal-cli.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if and .Values.proxy.enabled .Values.proxy.queue.enabled }}
+      initContainers:
+        - name: proxy-queue-dir
+          image: {{ .Values.proxy.image }}
+          command: ["mkdir", "-p", "/data/proxy-queue"]
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: config
+              mountPath: /data
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -90,6 +107,10 @@ spec:
               value: /etc/signal-cli-proxy/tokens.json
             - name: PYTHONDONTWRITEBYTECODE
               value: "1"
+            {{- if .Values.proxy.queue.enabled }}
+            - name: QUEUE_DIR
+              value: /queue
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.proxy.port }}
@@ -100,7 +121,12 @@ spec:
               port: http
           securityContext:
             runAsNonRoot: true
+            {{- if .Values.proxy.queue.enabled }}
+            runAsUser: 1000
+            runAsGroup: 1000
+            {{- else }}
             runAsUser: 65534
+            {{- end }}
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
@@ -114,6 +140,11 @@ spec:
             - name: proxy-tokens
               mountPath: /etc/signal-cli-proxy
               readOnly: true
+            {{- if .Values.proxy.queue.enabled }}
+            - name: config
+              mountPath: /queue
+              subPath: proxy-queue
+            {{- end }}
         {{- end }}
       volumes:
         {{- if .Values.proxy.enabled }}

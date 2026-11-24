@@ -153,4 +153,8 @@ proxy:
   #   "<sha256 hex>": {name: claude, number: "+48...", recipients: ["+48..."]}
   #   "<sha256 hex>": {name: app, number: "+48...", recipients: ["group.abc="], allow: [send]}
   tokensSecret: ""
+  # Router + disk queue on the config PVC (/queue = subPath proxy-queue, owned by uid 1000): each token only receives
+  # its own conversations, messages wait while it is offline. See files/auth-proxy.py.
+  queue:
+    enabled: false
   resources: {}
