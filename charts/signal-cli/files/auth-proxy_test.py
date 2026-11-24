@@ -418,7 +418,7 @@ class Router(unittest.TestCase):
         self.assertEqual(sent, [])
         push(dm(OTHER, "offline"))
         wait_for(lambda: sent, "notice")
-        self.assertIn("Box is offline", sent[0]["message"])
+        self.assertEqual(sent[0]["message"], "Box is offline. Your message is queued and arrives when it reconnects.")
 
     def test_client_checks(self):
         self.assertIn(b" 403 ", WS(RN, query="").status)  # allow without receive

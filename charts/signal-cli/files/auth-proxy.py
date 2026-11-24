@@ -198,7 +198,7 @@ def enqueue(rule, number, conv, msg):
 
 async def notify(number, conv, label):
     body = json.dumps({"number": number, "recipients": [conv],
-                       "message": f"\u23f8 {label} is offline: queued, it arrives when it reconnects."}).encode()
+                       "message": f"{label} is offline. Your message is queued and arrives when it reconnects."}).encode()
     try:
         ur, uw = await asyncio.open_connection(*UPSTREAM)
         uw.write(b"POST /v2/send HTTP/1.1\r\nHost: x\r\nContent-Type: application/json\r\nConnection: close\r\n"
