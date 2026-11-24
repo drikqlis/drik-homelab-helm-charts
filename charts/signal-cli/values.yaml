@@ -130,6 +130,10 @@ mode: normal
 
 autoReceiveSchedule: 0 19 * * *
 
+# more env for the signal-cli container (list of {name, value}), e.g. json-rpc mode:
+#   - {name: JSON_RPC_RECEIVE_MODE, value: manual}  # fetch only while a websocket client is attached (no lost messages)
+extraEnv: []
+
 # Token proxy (files/auth-proxy.py) in front of the API, which has no auth. When enabled, the Service/Ingress go to
 # the proxy and a NetworkPolicy leaves only the proxy's port reachable from outside the pod.
 # tokens: {"<sha256 hex of token>": rule}; rule = {name, number, recipients: [...], allow: [...]} or
