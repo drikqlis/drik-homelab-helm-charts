@@ -50,6 +50,9 @@ spec:
           - name: AUTO_RECEIVE_SCHEDULE
             value: {{ .Values.autoReceiveSchedule }}
           {{- end }}
+          {{- with .Values.extraEnv }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
           ports:
             - name: {{ if .Values.proxy.enabled }}api{{ else }}http{{ end }}
               containerPort: {{ .Values.service.port }}
