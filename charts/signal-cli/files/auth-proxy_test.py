@@ -220,7 +220,9 @@ def grp(text="g"):
 
 async def router_upstream(r, w):
     head = await r.readuntil(b"\r\n\r\n")
-    if head.startswith(b"POST /v2/send"):
+    if head.startswith(b"GET /v1/attachments/"):
+        w.write(b"HTTP/1.1 200 OK\r\nContent-Length: 3\r\nConnection: close\r\n\r\nIMG")
+    elif head.startswith(b"POST /v2/send"):
         n = next(int(l.split(b":")[1]) for l in head.split(b"\r\n") if l.lower().startswith(b"content-length:"))
         sent.append(json.loads(await r.readexactly(n)))
         w.write(b"HTTP/1.1 201 Created\r\nContent-Length: 0\r\nConnection: close\r\n\r\n")
@@ -300,7 +302,7 @@ class Router(unittest.TestCase):
         cls.tokens = os.path.join(cls.dir, "tokens.json")
         rule = lambda n, rc, **kw: {"name": n, "number": BOT, "recipients": rc, **kw}
         json.dump({hashlib.sha256(t.encode()).hexdigest(): r for t, r in [
-            (RA, rule("ra", [ME, PUB])), (RB, rule("rb", [OTHER], label="Box")), (RC, rule("rc", [C])),
+            (RA, rule("ra", [ME, PUB], allow=["send", "react", "receive", "attachments"])), (RB, rule("rb", [OTHER], label="Box")), (RC, rule("rc", [C])),
             (RN, rule("rn", [ME], allow=["send"])), (ADMIN, {"name": "admin", "admin": True})]},
                   open(cls.tokens, "w"))
         cls.q = os.path.join(cls.dir, "queue")
@@ -419,6 +421,16 @@ class Router(unittest.TestCase):
         push(dm(OTHER, "offline"))
         wait_for(lambda: sent, "notice")
         self.assertEqual(sent[0]["message"], "Box is offline. Your message is queued and arrives when it reconnects.")
+
+    def test_attachments_only_from_own_queue(self):
+        m = grp("pic")
+        m["envelope"]["dataMessage"]["attachments"] = [{"id": "abc.jpg", "contentType": "image/jpeg"}]
+        push(m)
+        wait_for(lambda: self.queued("ra"), "queued")
+        for tok, aid, want in [(RA, "abc.jpg", b" 200 "), (RA, "other.jpg", b" 403 "), (RB, "abc.jpg", b" 403 ")]:
+            with socket.create_connection(("127.0.0.1", RPX), timeout=5) as s:
+                s.sendall(f"GET /v1/attachments/{aid} HTTP/1.1\r\nAuthorization: Bearer {tok}\r\n\r\n".encode())
+                self.assertIn(want, s.recv(100), (tok, aid))
 
     def test_client_checks(self):
         self.assertIn(b" 403 ", WS(RN, query="").status)  # allow without receive

@@ -12,6 +12,8 @@ Tokens: $TOKENS_FILE (Secret from values proxy.tokens, or proxy.tokensSecret), J
     receive  GET /v1/receive/<number>              websocket: ALL incoming messages of the account (router mode: see below)
     read     GET /v1/contacts/<number>, GET /v1/groups/<number>[/<group id>]
     groups   POST /v1/groups/<number>/<group id>/join|quit, for group ids in recipients
+    attachments  GET /v1/attachments/<id>          router mode: only files of messages queued for this rule
+                                                   (until acknowledged); otherwise needs receive too (not default)
   A group is a recipient like a number ("group.<id>", as /v1/groups lists it).
   {"name": "admin", "admin": true}  everything
 Router mode ($QUEUE_DIR set; otherwise receive is piped as above): the proxy keeps one websocket to rest-api per number
@@ -61,6 +63,8 @@ def allowed(method, path, body, rule):
         if path == f"/v1/receive/{num}":
             return "receive" in allow
         parts = path.split("/")  # "", v1, groups|contacts, <num>[, <group id>]
+        if len(parts) == 4 and parts[1:3] == ["v1", "attachments"]:
+            return "attachments" in allow and (routed_attachment(rule["name"], parts[3]) if QUEUE_DIR else "receive" in allow)
         return "read" in allow and parts[1:4] in (["v1", "contacts", num], ["v1", "groups", num]) and len(parts) <= 5
     if method == "POST" and "groups" in allow:
         parts = path.split("/")
@@ -164,6 +168,12 @@ def ack(name, after):
         f.write("".join(json.dumps(e) + "\n" for e in keep))
     os.replace(tmp, qfile(name))
     return keep
+
+
+def routed_attachment(name, aid):
+    """An attachment of a message still in this rule's queue (only its own conversations)."""
+    return any(a.get("id") == aid for e in load(name)
+               for a in (((e["msg"].get("envelope") or {}).get("dataMessage") or {}).get("attachments") or []))
 
 
 def conversation(env):
