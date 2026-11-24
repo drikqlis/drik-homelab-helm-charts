@@ -22,3 +22,4 @@
 *.tmproj
 .vscode/
 files/*_test.py
+__pycache__/
