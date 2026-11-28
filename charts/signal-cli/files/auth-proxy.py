@@ -14,6 +14,7 @@ Tokens: $TOKENS_FILE (Secret from values proxy.tokens, or proxy.tokensSecret), J
     groups   POST /v1/groups/<number>/<group id>/join|quit, for group ids in recipients
     attachments  GET /v1/attachments/<id>          router mode: only files of messages queued for this rule
                                                    (until acknowledged); otherwise needs receive too (not default)
+    agents   /v1/agents/...                        agent bus, router mode only (see below; not default)
   A group is a recipient like a number ("group.<id>", as /v1/groups lists it).
   {"name": "admin", "admin": true}  everything
 Router mode ($QUEUE_DIR set; otherwise receive is piped as above): the proxy keeps one websocket to rest-api per number
@@ -24,10 +25,23 @@ misses nothing while offline. GET /v1/receive/<number>[?after=<id>] (websocket) 
 frame plus a top-level "id"; with after=<id> it first drops entries <= id (acknowledged) and replays the newer ones,
 without it nothing old is sent. When a message from a number is queued while the rule has no client, one notice per
 offline period goes to that conversation ("<label or name> is offline"; optional rule field "label").
+Agent bus (router mode, allow "agents"; admin too): coding-agent sessions on different PCs (one token per PC, PC name =
+rule label, else name; keep labels unique) message each other. Every /v1/agents/ endpoint needs agents (else 403):
+  PUT  /v1/agents/sessions  {"sessions": [{"id", "harness", "title", "cwd", "status"}]} replaces this PC's list (in
+       memory, lost on restart: clients re-publish every few minutes). <= 64 sessions, body <= 64 KB, strings cut to
+       id/harness/status 128, title 200, cwd 300. 204.
+  GET  /v1/agents/sessions  200 {"pcs": [{"pc", "online", "updated", "sessions"}]}: every agents rule that published
+       in the last 10 min (older lists are dropped); online = that rule has a websocket client attached.
+  POST /v1/agents/send      {"to": {"pc", "session"}, "from": {"session", "title"}, "text"} (text <= 16 KB) queues
+       {"agent": {"from": {"pc", "session", "title"}, "to": {...}, "text", "id"}} for the rule whose PC name is to.pc
+       (must have agents, else 404; its own PC is fine), like any routed message (ids, replay, live push; no offline
+       notice). from.pc is the sender's PC name (set here, not by the client). 200 {"id", "online"}. 60 sends per
+       10 min per sending rule, then 429. The target needs receive (websocket) to get them.
+  Errors: 400 bad JSON/fields, 404 unknown PC or endpoint, 405 wrong method, 413 too large, 503 not in router mode.
 GET /v1/health needs no token (probes). Anything else: 403. Client sends "Authorization: Bearer <token>".
 One request per connection (Connection: close upstream), so nothing unchecked can follow a checked request.
 """
-import asyncio, base64, hashlib, hmac, json, os, time, urllib.parse
+import asyncio, base64, collections, hashlib, hmac, json, os, time, urllib.parse
 
 UPSTREAM = ("127.0.0.1", int(os.environ.get("UPSTREAM_PORT", "8080")))
 PORT = int(os.environ.get("PORT", "8081"))
@@ -191,17 +205,22 @@ def route(number, msg):
             enqueue(rule, number, conv, msg)
 
 
-def enqueue(rule, number, conv, msg):
+def new_id():
     global last_id
-    name = rule["name"]
     last_id = max(time.time_ns() // 1000, last_id + 1)
-    e = {"id": last_id, "t": int(time.time()), "msg": msg}
+    return last_id
+
+
+def enqueue(rule, number, conv, msg, eid=None):
+    name = rule["name"]
+    e = {"id": eid or new_id(), "t": int(time.time()), "msg": msg}
     with open(qfile(name), "a") as f:
         f.write(json.dumps(e) + "\n")
     for q in clients.get(name, ()):
         q.put_nowait(e)
-    env = msg["envelope"]
-    if not clients.get(name) and name not in notified and "dataMessage" in env and (env.get("sourceNumber") or env.get("source")):
+    env = msg.get("envelope")  # agent frames have none: no notice
+    if isinstance(env, dict) and not clients.get(name) and name not in notified and "dataMessage" in env \
+            and (env.get("sourceNumber") or env.get("source")):
         notified.add(name)
         asyncio.create_task(notify(number, conv, rule.get("label") or name))
 
@@ -282,9 +301,110 @@ async def serve_client(cr, cw, name, key, after):
         clients[name].discard(q)
 
 
+# --- agent bus ---
+AGENT_BODY, AGENT_TEXT, AGENT_TTL, AGENT_SESSIONS = 64 << 10, 16 << 10, 600, 64
+SESSION_CAPS = {"id": 128, "harness": 128, "title": 200, "cwd": 300, "status": 128}
+RATE, RATE_WINDOW = 60, 600  # sends per window (s) per sending rule
+published = {}  # rule name -> {"updated": epoch, "sessions": [...]}
+sends = {}  # rule name -> deque of send times
+
+
+class TooLarge(Exception):
+    pass
+
+
+def has_agents(rule):
+    return bool(rule.get("admin")) or "agents" in (rule.get("allow") or DEFAULT_ALLOW)
+
+
+def pc_of(rule):
+    return rule.get("label") or rule["name"]
+
+
+def text_field(d, key, n):
+    """d[key] as a string cut to n characters (missing/null: ""); anything else is a 400."""
+    v = d.get(key)
+    if v is None:
+        return ""
+    if not isinstance(v, str):
+        raise ValueError(key)
+    return v[:n]
+
+
+def agent_list():
+    old = time.time() - AGENT_TTL
+    for n in [n for n, p in published.items() if p["updated"] < old]:
+        del published[n]
+    return sorted(({"pc": pc_of(r), "online": bool(clients.get(r["name"])), **published[r["name"]]}
+                   for r in rules() if has_agents(r) and r["name"] in published), key=lambda p: p["pc"])
+
+
+def agents(method, path, body, rule):
+    """/v1/agents/... for an authenticated rule: (code, reason, JSON body or None)."""
+    if not has_agents(rule):
+        return 403, "Forbidden", None
+    if not QUEUE_DIR:
+        return 503, "Service Unavailable", None
+    what = path[len("/v1/agents/"):]
+    if what not in ("sessions", "send"):
+        return 404, "Not Found", None
+    if (what, method) not in (("sessions", "GET"), ("sessions", "PUT"), ("send", "POST")):
+        return 405, "Method Not Allowed", None
+    if method == "GET":
+        return 200, "OK", {"pcs": agent_list()}
+    name = rule["name"]
+    try:
+        b = json.loads(body)
+        if not isinstance(b, dict):
+            raise ValueError("body")
+        if what == "sessions":
+            ss = b.get("sessions")
+            if not isinstance(ss, list) or not all(isinstance(x, dict) for x in ss):
+                raise ValueError("sessions")
+            if len(ss) > AGENT_SESSIONS:
+                raise TooLarge("sessions")
+            published[name] = {"updated": int(time.time()),
+                               "sessions": [{k: text_field(x, k, n) for k, n in SESSION_CAPS.items()} for x in ss]}
+            return 204, "No Content", None
+        to, frm, text = b.get("to"), b.get("from") or {}, b.get("text")
+        if not isinstance(to, dict) or not isinstance(frm, dict) or not isinstance(text, str) or not text \
+                or not isinstance(to.get("pc"), str) or not to["pc"]:
+            raise ValueError("fields")
+        if len(text.encode()) > AGENT_TEXT:
+            raise TooLarge("text")
+        dest = {"pc": to["pc"], "session": text_field(to, "session", SESSION_CAPS["id"])}
+        src = {"pc": pc_of(rule), "session": text_field(frm, "session", SESSION_CAPS["id"]),
+               "title": text_field(frm, "title", SESSION_CAPS["title"])}
+    except TooLarge:
+        return 413, "Payload Too Large", None
+    except ValueError:
+        return 400, "Bad Request", None
+    target = next((r for r in rules() if has_agents(r) and pc_of(r) == dest["pc"]), None)
+    if not target:
+        return 404, "Not Found", None
+    now, recent = time.time(), sends.setdefault(name, collections.deque())
+    while recent and recent[0] <= now - RATE_WINDOW:
+        recent.popleft()
+    if len(recent) >= RATE:
+        return 429, "Too Many Requests", None
+    recent.append(now)
+    eid = new_id()
+    enqueue(target, None, None, {"agent": {"from": src, "to": dest, "text": text, "id": eid}}, eid)
+    return 200, "OK", {"id": eid, "online": bool(clients.get(target["name"]))}
+
+
 async def reply(w, code, text):
     w.write(f"HTTP/1.1 {code} {text}\r\nContent-Type: text/plain\r\nContent-Length: {len(text) + 1}\r\n"
             f"Connection: close\r\n\r\n{text}\n".encode())
+    await w.drain()
+
+
+async def respond(w, code, text, obj):
+    if obj is None and code != 204:
+        return await reply(w, code, text)
+    data = b"" if obj is None else json.dumps(obj).encode()
+    w.write(f"HTTP/1.1 {code} {text}\r\nContent-Type: application/json\r\nContent-Length: {len(data)}\r\n"
+            f"Connection: close\r\n\r\n".encode() + data)
     await w.drain()
 
 
@@ -318,7 +438,7 @@ async def handle(cr, cw):
                 or "transfer-encoding" in h or "/." in path or "//" in path or not path.startswith("/"):
             return await reply(cw, 400, "Bad Request")
         n = int(h.get("content-length") or 0)
-        if n > MAX_BODY:
+        if n > (AGENT_BODY if path.startswith("/v1/agents/") else MAX_BODY):
             return await reply(cw, 413, "Payload Too Large")
         if h.get("expect", "").lower() == "100-continue":
             cw.write(b"HTTP/1.1 100 Continue\r\n\r\n")
@@ -330,6 +450,10 @@ async def handle(cr, cw):
             if not rule:
                 print(f"401 {method} {raw}", flush=True)
                 return await reply(cw, 401, "Unauthorized")
+            if path.startswith("/v1/agents/"):  # answered here, never forwarded
+                code, text, obj = agents(method, path, body, rule)
+                print(f"{'ok' if code < 300 else code} {who} {method} {raw}", flush=True)
+                return await respond(cw, code, text, obj)
             if not allowed(method, path, body, rule):
                 print(f"403 {who} {method} {raw}", flush=True)
                 return await reply(cw, 403, "Forbidden")
