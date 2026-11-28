@@ -141,6 +141,8 @@ extraEnv: []
 #   send: messages (and edits) to recipients; react: reactions to recipients; receive: websocket, ALL incoming
 #   messages; delete: delete-for-everyone in chats with recipients (not in the default);
 #   read: GET contacts/groups; groups: join/quit the groups listed in recipients.
+#   agents (router mode, not in the default): agent bus /v1/agents/..., coding-agent sessions on different PCs
+#   (one token per PC, PC name = label) list each other and send messages via the receiver's queue. See files/auth-proxy.py.
 # Groups are recipients too: "group.<id>" as GET /v1/groups lists it. Clients send "Authorization: Bearer <token>".
 # Put them in secret values (the chart renders them into a Secret), or point tokensSecret at an existing Secret
 # with key tokens.json (same JSON).

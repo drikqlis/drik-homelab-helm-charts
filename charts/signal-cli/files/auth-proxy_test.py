@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Tests for auth-proxy.py against a fake upstream (records requests; 101 + echo for websockets).
 Run: python3 -I charts/signal-cli/files/auth-proxy_test.py"""
-import asyncio, base64, hashlib, json, os, socket, subprocess, sys, tempfile, threading, time, unittest
+import asyncio, base64, hashlib, importlib.util, json, os, socket, subprocess, sys, tempfile, threading, time, unittest
 
 HERE = os.path.dirname(os.path.realpath(__file__))
 ME, BOT, OTHER = "+48111", "+48222", "+48333"
-TOK, ADMIN, NARROW, GRP, DEL = "t0ken", "adm1n", "n4rrow", "gr0up", "d3l"
+TOK, ADMIN, NARROW, GRP, DEL, AGT = "t0ken", "adm1n", "n4rrow", "gr0up", "d3l", "4gt"
 G = "group.abc="
 seen = []  # request heads+bodies the upstream got
 
@@ -42,17 +42,25 @@ def run_upstream():
     asyncio.run(main())
 
 
-def req(method, path, body=None, token=TOK, extra=b""):
-    data = json.dumps(body).encode() if body is not None else b""
+def http(port, method, path, body=None, token=TOK, extra=b"", raw=None):
+    """(status, response body) for one request; raw: send these body bytes instead of JSON."""
+    data = raw if raw is not None else json.dumps(body).encode() if body is not None else b""
     head = f"{method} {path} HTTP/1.1\r\nHost: x\r\nContent-Length: {len(data)}\r\n"
     if token:
         head += f"Authorization: Bearer {token}\r\n"
-    with socket.create_connection(("127.0.0.1", PX), timeout=5) as s:
+    with socket.create_connection(("127.0.0.1", port), timeout=5) as s:
         s.sendall(head.encode() + b"\r\n" + data + extra)
         out = b""
-        while d := s.recv(4096):
-            out += d
-    return int(out.split(b" ")[1])
+        try:
+            while d := s.recv(65536):
+                out += d
+        except ConnectionResetError:  # proxy answered before reading an oversized body
+            pass
+    return int(out.split(b" ")[1]), out.partition(b"\r\n\r\n")[2]
+
+
+def req(method, path, body=None, token=TOK, extra=b""):
+    return http(PX, method, path, body, token, extra)[0]
 
 
 class Proxy(unittest.TestCase):
@@ -67,7 +75,9 @@ class Proxy(unittest.TestCase):
                    hashlib.sha256(DEL.encode()).hexdigest(): {"name": "del", "number": BOT, "recipients": [ME],
                                                               "allow": ["send", "delete"]},
                    hashlib.sha256(GRP.encode()).hexdigest(): {"name": "grp", "number": BOT, "recipients": [G],
-                                                              "allow": ["send", "read", "groups"]}},
+                                                              "allow": ["send", "read", "groups"]},
+                   hashlib.sha256(AGT.encode()).hexdigest(): {"name": "agt", "number": BOT, "recipients": [],
+                                                              "allow": ["agents"]}},
                   open(cls.tokens, "w"))
         cls.p = subprocess.Popen([sys.executable, "-I", os.path.join(HERE, "auth-proxy.py")],
                                  env=dict(os.environ, PORT=str(PX), UPSTREAM_PORT=str(UP), TOKENS_FILE=cls.tokens),
@@ -182,10 +192,17 @@ class Proxy(unittest.TestCase):
             self.assertEqual(s.recv(100), b"echo:ping")
         self.assertIn(b"Connection: Upgrade", seen[0])
 
+    def test_agents_need_router_mode_and_permission(self):
+        self.assertEqual(req("GET", "/v1/agents/sessions", token=AGT), 503)
+        self.assertEqual(req("GET", "/v1/agents/sessions"), 403)  # no agents in allow
+        self.assertEqual(req("POST", "/v1/agents/send", {"to": {"pc": "x"}, "text": "t"}), 403)
+        self.assertEqual(seen, [])  # never forwarded
+
 
 # --- router mode: fake rest-api that pushes receive frames and records POST /v2/send ---
 RUP, RPX = free_port(), free_port()
 RA, RB, RC, RN = "t-ra", "t-rb", "t-rc", "t-rn"
+AX, AY, AS = "t-ax", "t-ay", "t-as"  # agent bus: PCs mk-x870, mm-b850, "as" (no label: name)
 sent, subs, loop_box = [], [], []  # recorded notices, websocket writers attached, the fake's event loop
 GID = "int-group-id"
 PUB = "group." + base64.b64encode(GID.encode()).decode()
@@ -303,7 +320,10 @@ class Router(unittest.TestCase):
         rule = lambda n, rc, **kw: {"name": n, "number": BOT, "recipients": rc, **kw}
         json.dump({hashlib.sha256(t.encode()).hexdigest(): r for t, r in [
             (RA, rule("ra", [ME, PUB], allow=["send", "react", "receive", "attachments"])), (RB, rule("rb", [OTHER], label="Box")), (RC, rule("rc", [C])),
-            (RN, rule("rn", [ME], allow=["send"])), (ADMIN, {"name": "admin", "admin": True})]},
+            (RN, rule("rn", [ME], allow=["send"])), (ADMIN, {"name": "admin", "admin": True}),
+            (AX, rule("ax", [], label="mk-x870", allow=["send", "receive", "agents"])),
+            (AY, rule("ay", [], label="mm-b850", allow=["receive", "agents", "attachments"])),
+            (AS, rule("as", [], allow=["agents"]))]},
                   open(cls.tokens, "w"))
         cls.q = os.path.join(cls.dir, "queue")
         cls.p = subprocess.Popen([sys.executable, "-I", os.path.join(HERE, "auth-proxy.py")],
@@ -440,6 +460,139 @@ class Router(unittest.TestCase):
         with socket.create_connection(("127.0.0.1", RPX), timeout=5) as s:  # plain GET, no upgrade
             s.sendall(f"GET /v1/receive/{BOT} HTTP/1.1\r\nAuthorization: Bearer {RA}\r\n\r\n".encode())
             self.assertIn(b" 400 ", s.recv(100))
+
+    # --- agent bus ---
+    def api(self, method, path, body=None, token=AX, raw=None):
+        code, out = http(RPX, method, path, body, token, raw=raw)
+        return code, json.loads(out) if out.startswith(b"{") else None
+
+    def agent_send(self, to="mm-b850", text="hello", token=AX, **kw):
+        return self.api("POST", "/v1/agents/send", {"to": {"pc": to, "session": "s2"},
+                                                    "from": {"session": "s1", "title": "fixing"}, "text": text, **kw},
+                        token)
+
+    def test_agents_permission(self):
+        for tok in (RA, RN):  # no agents in allow
+            self.assertEqual(self.api("GET", "/v1/agents/sessions", token=tok)[0], 403)
+            self.assertEqual(self.api("PUT", "/v1/agents/sessions", {"sessions": []}, token=tok)[0], 403)
+            self.assertEqual(self.agent_send(token=tok)[0], 403)
+        self.assertEqual(self.api("GET", "/v1/agents/sessions", token="nope")[0], 401)
+        self.assertEqual(self.queued("ay"), [])
+
+    def test_agents_publish_and_list(self):
+        sessions = [{"id": "s1", "harness": "claude", "title": "t" * 300, "cwd": None, "status": "busy", "x": 1},
+                    {"id": "s2", "harness": "codex", "title": "two", "cwd": "/home/u/" + "d" * 400, "status": "idle"}]
+        self.assertEqual(self.api("PUT", "/v1/agents/sessions", {"sessions": sessions}), (204, None))
+        self.assertEqual(self.api("PUT", "/v1/agents/sessions", {"sessions": []}, token=AY), (204, None))
+        code, out = self.api("GET", "/v1/agents/sessions", token=AY)
+        self.assertEqual(code, 200)
+        pcs = {p["pc"]: p for p in out["pcs"]}
+        self.assertNotIn("ra", pcs)
+        self.assertNotIn("Box", pcs)
+        x = pcs["mk-x870"]
+        self.assertFalse(x["online"])
+        self.assertLessEqual(abs(x["updated"] - time.time()), 5)
+        self.assertEqual(x["sessions"][0], {"id": "s1", "harness": "claude", "title": "t" * 200, "cwd": "",
+                                            "status": "busy"})
+        self.assertEqual(len(x["sessions"][1]["cwd"]), 300)
+        self.assertEqual(pcs["mm-b850"]["sessions"], [])
+        c = WS(AX)
+        self.assertTrue({p["pc"]: p for p in self.api("GET", "/v1/agents/sessions")[1]["pcs"]}["mk-x870"]["online"])
+        c.close()
+        self.assertEqual(self.api("PUT", "/v1/agents/sessions", {"sessions": sessions[1:]}), (204, None))  # replaces
+        self.assertEqual([s["id"] for s in {p["pc"]: p for p in self.api("GET", "/v1/agents/sessions")[1]["pcs"]}
+                          ["mk-x870"]["sessions"]], ["s2"])
+
+    def test_agents_send_online_and_no_spoofing(self):
+        c = WS(AY)
+        code, out = self.agent_send(**{"from": {"pc": "evil", "session": "s1", "title": "fixing"}})
+        self.assertEqual(code, 200)
+        self.assertTrue(out["online"])
+        want = {"agent": {"from": {"pc": "mk-x870", "session": "s1", "title": "fixing"},
+                          "to": {"pc": "mm-b850", "session": "s2"}, "text": "hello", "id": out["id"]}, "id": out["id"]}
+        self.assertEqual(c.msg(), want)
+        c.close()
+        self.assertEqual([e["id"] for e in self.queued("ay")], [out["id"]])
+        self.assertEqual(self.queued("ax"), [])
+        time.sleep(0.3)
+        self.assertEqual(sent, [])
+
+    def test_agents_send_offline_queued_and_replayed(self):
+        code, out = self.agent_send(text="while away")
+        self.assertEqual(code, 200)
+        self.assertFalse(out["online"])
+        time.sleep(0.3)
+        self.assertEqual(sent, [])  # no offline notice for agent frames
+        self.assertEqual(self.queued("ay")[0]["msg"]["agent"]["text"], "while away")
+        c = WS(AY, query="?after=0")
+        got = c.msg()
+        self.assertEqual((got["id"], got["agent"]["id"], got["agent"]["text"]), (out["id"], out["id"], "while away"))
+        live = self.agent_send(text="now")[1]
+        self.assertTrue(live["online"])
+        self.assertGreater(live["id"], out["id"])
+        self.assertEqual(c.msg()["agent"]["text"], "now")
+        c.close()
+        c = WS(AY, query=f"?after={live['id']}")  # acknowledged: nothing replayed
+        self.assertIsNone(c.recv(0.5))
+        c.close()
+        self.assertEqual(self.queued("ay"), [])
+
+    def test_agents_send_to_own_pc(self):
+        code, out = self.agent_send(to="mk-x870")
+        self.assertEqual(code, 200)
+        self.assertEqual(self.queued("ax")[0]["msg"]["agent"]["from"]["pc"], "mk-x870")
+
+    def test_agents_errors(self):
+        self.assertEqual(self.agent_send(to="nowhere")[0], 404)
+        self.assertEqual(self.agent_send(to="ra")[0], 404)  # exists, but no agents
+        self.assertEqual(self.agent_send(to="Box")[0], 404)
+        self.assertEqual(self.api("GET", "/v1/agents/nope")[0], 404)
+        self.assertEqual(self.api("GET", "/v1/agents/send")[0], 405)
+        self.assertEqual(self.api("POST", "/v1/agents/sessions", {"sessions": []})[0], 405)
+        for b in ({"to": {"pc": "mm-b850"}}, {"to": "mm-b850", "text": "x"}, {"to": {"pc": ""}, "text": "x"},
+                  {"to": {"pc": "mm-b850", "session": 5}, "text": "x"}, {"to": {"pc": "mm-b850"}, "text": ""}, [1]):
+            self.assertEqual(self.api("POST", "/v1/agents/send", b)[0], 400, b)
+        self.assertEqual(self.api("POST", "/v1/agents/send", raw=b"{nope")[0], 400)
+        self.assertEqual(self.api("PUT", "/v1/agents/sessions", {"sessions": "x"})[0], 400)
+        self.assertEqual(self.api("PUT", "/v1/agents/sessions", {"sessions": [{"id": 1}]})[0], 400)
+        self.assertEqual(self.agent_send(text="x" * (16 << 10))[0], 200)
+        self.assertEqual(self.agent_send(text="x" * ((16 << 10) + 1))[0], 413)
+        self.assertEqual(self.api("PUT", "/v1/agents/sessions", {"sessions": [{"id": "s"}] * 65})[0], 413)
+        self.assertEqual(self.api("PUT", "/v1/agents/sessions", raw=b" " * ((64 << 10) + 1))[0], 413)
+        self.assertEqual(len(self.queued("ay")), 1)  # only the 16 KB one
+
+    def test_agents_rate_limit(self):
+        for i in range(60):
+            self.assertEqual(self.agent_send(to="as", token=AS)[0], 200, i)
+        self.assertEqual(self.agent_send(to="as", token=AS)[0], 429)
+        self.assertEqual(len(self.queued("as")), 60)
+        self.assertEqual(self.agent_send(to="as")[0], 200)  # per sending rule
+
+    def test_agent_frames_dont_break_existing_paths(self):
+        self.assertEqual(self.agent_send()[0], 200)
+        with socket.create_connection(("127.0.0.1", RPX), timeout=5) as s:  # attachment lookup scans the queue
+            s.sendall(f"GET /v1/attachments/abc.jpg HTTP/1.1\r\nAuthorization: Bearer {AY}\r\n\r\n".encode())
+            self.assertIn(b" 403 ", s.recv(100))
+        push(dm(ME, "after agent"))
+        wait_for(lambda: self.queued("ra"), "routing still works")
+        self.assertIsNone(self.p.poll())
+
+
+class AgentList(unittest.TestCase):
+    """agent_list() in-process: stale lists are dropped."""
+    def test_stale_dropped(self):
+        spec = importlib.util.spec_from_file_location("proxy", os.path.join(HERE, "auth-proxy.py"))
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        m.TOKENS_FILE = os.path.join(tempfile.mkdtemp(), "tokens.json")
+        json.dump({"a": {"name": "a", "label": "pc-a", "allow": ["agents"]}, "b": {"name": "b", "allow": ["agents"]},
+                   "c": {"name": "c", "allow": ["send"]}}, f := open(m.TOKENS_FILE, "w"))
+        f.close()
+        now = int(time.time())
+        m.published.update(a={"updated": now - 30, "sessions": []}, b={"updated": now - 601, "sessions": []},
+                           c={"updated": now, "sessions": []})
+        self.assertEqual(m.agent_list(), [{"pc": "pc-a", "online": False, "updated": now - 30, "sessions": []}])
+        self.assertNotIn("b", m.published)
 
 
 if __name__ == "__main__":
