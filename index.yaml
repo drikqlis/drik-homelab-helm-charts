@@ -1105,6 +1105,16 @@ entries:
   signal-cli:
   - apiVersion: v2
     appVersion: "0.102"
+    created: "2026-11-28T18:38:26.79826304Z"
+    description: A Helm chart for Kubernetes
+    digest: 8843204e9c7ac1d2aa9831eba8abd4d78c6d5befab1f5a467704f074f484de76
+    name: signal-cli
+    type: application
+    urls:
+    - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/signal-cli-0.1.13/signal-cli-0.1.13.tgz
+    version: 0.1.13
+  - apiVersion: v2
+    appVersion: "0.102"
     created: "2026-11-24T12:17:55.257173738Z"
     description: A Helm chart for Kubernetes
     digest: 49430fb49e0f1f436cf26701efdccf335bc1b3508baffaf230d906169f6eddeb
@@ -1960,4 +1970,4 @@ entries:
     urls:
     - https://github.com/drikqlis/drik-homelab-helm-charts/releases/download/wish-journal-0.1.0/wish-journal-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-24T12:17:55.257358794Z"
+generated: "2026-11-28T18:38:26.798570437Z"
