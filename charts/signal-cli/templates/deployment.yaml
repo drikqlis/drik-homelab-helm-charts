@@ -18,6 +18,7 @@ spec:
       annotations:
         {{- if .Values.proxy.enabled }}
         checksum/proxy: {{ .Files.Get "files/auth-proxy.py" | sha256sum }}
+        checksum/tokens: {{ .Values.proxy.tokens | toJson | sha256sum }}
         {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
